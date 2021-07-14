@@ -1,0 +1,24 @@
+{
+  "name": "acmarche/bottin-wp",
+  "require": {
+    "php": "^7.4",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "symfony/http-foundation": "^5.3",
+    "symfony/http-client": "^5.3",
+    "symfony/dotenv": "^5.3",
+    "symfony/cache": "^5.3",
+    "symfony/property-info": "^5.3",
+    "symfony/property-access": "^5.3",
+    "phpdocumentor/reflection-common": "^2.2",
+    "phpdocumentor/reflection-docblock": "^5.2",
+    "phpdocumentor/type-resolver": "^1.4",
+    "ext-dom": "*",
+    "symfony/translation": "^5.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "AcMarche\\Bottin\\": "AcMarche\\Bottin"
+    }
+  }
+}
