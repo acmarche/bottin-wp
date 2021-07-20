@@ -3,8 +3,8 @@
 namespace AcMarche\Bottin\Repository;
 
 use AcMarche\Bottin\Bottin;
+use AcMarche\Bottin\Env;
 use AcMarche\Bottin\RouterBottin;
-use AcMarche\Common\Env;
 use AcMarche\Common\Mailer;
 use Exception;
 use PDO;

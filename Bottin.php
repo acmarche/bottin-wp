@@ -3,7 +3,6 @@
 
 namespace AcMarche\Bottin;
 
-use AcMarche\Common\Env;
 use stdClass;
 
 class Bottin
