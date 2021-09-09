@@ -298,8 +298,12 @@ class BottinRepository
             $classements
         );
 
-        $fiches = array_unique($fiches, SORT_REGULAR);
-        $fiches = $this->sort($fiches);
+        $data = [];
+        foreach ($fiches as $fiche) {
+            $data[$fiche->id] = $fiche;
+        }
+
+        $fiches = $this->sort($data);
 
         return $fiches;
     }
