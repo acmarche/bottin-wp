@@ -24,7 +24,7 @@ class RouterBottin extends Router
     public static function getUrlCategoryBottin(\stdClass $category): string
     {
         if (self::isEconomie([$category], new BottinRepository())) {
-            return self::generateCategoryUrlCap($category);
+            return self::generateCategoryUrlCap($category,new BottinRepository());
         }
 
         return self::getBaseUrlSite(Theme::ECONOMIE).self::BOTTIN_CATEGORY_URL.'/'.$category->slug;
@@ -140,9 +140,11 @@ class RouterBottin extends Router
     /**
      * url pour recherche via le site de marche.
      */
-    public static function generateCategoryUrlCap(\stdClass $category): ?string
+    public static function generateCategoryUrlCap(\stdClass $category, BottinRepository $bottinRepository): ?string
     {
-        return 'https://cap.marche.be/secteur/'.$category->slug;
+        $parent = $bottinRepository->getCategory($category->parent_id);
+
+        return 'https://cap.marche.be/secteur/'.$parent->slug.'/'.$category->slug;
     }
 
     private static function isEconomie(array $categories, BottinRepository $bottinRepository): ?\stdClass
