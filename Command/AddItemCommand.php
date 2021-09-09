@@ -13,11 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class AddItemCommand extends Command
 {
     protected static $defaultName = 'menu:additem';
-
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
+    private SymfonyStyle $io;
 
     protected function configure()
     {

@@ -7,6 +7,15 @@ use stdClass;
 
 class Bottin
 {
+    public const COMMERCES = 610;
+    public const LIBERALES = 591;
+    public const PHARMACIES = 390;
+    public const ECO = 511;
+    public const SANTE = 488;
+    public const SANTECO = 636;
+
+    public const ALL = [self::COMMERCES,self::LIBERALES,self::PHARMACIES,self::ECO,self::SANTE,self::SANTECO];
+
     public static function getUrlBottin(): string
     {
         Env::loadEnv();

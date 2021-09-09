@@ -9,21 +9,9 @@ use AcMarche\Theme\Inc\Theme;
 
 class CategorySynchronizer
 {
-    /**
-     * @var int
-     */
     private int $categoryId;
-    /**
-     * @var WpBottinRepository
-     */
     private WpBottinRepository $wpRepository;
-    /**
-     * @var BottinRepository
-     */
     private BottinRepository $bottinRepository;
-    /**
-     * @var CategoryCreator
-     */
     private CategoryCreator $categoryCreator;
 
     public function __construct(int $categoryId)

@@ -13,7 +13,6 @@ class Twig
     public static function LoadTwig(?string $path = null): Environment
     {
         $debug = true;
-        //todo get instance
         if ( ! $path) {
             $path = get_template_directory().'/templates';
         }

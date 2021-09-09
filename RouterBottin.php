@@ -3,6 +3,7 @@
 
 namespace AcMarche\Bottin;
 
+use AcMarche\Bottin\Repository\BottinRepository;
 use AcMarche\Common\Router;
 use AcMarche\Theme\Inc\Theme;
 
@@ -22,14 +23,21 @@ class RouterBottin extends Router
 
     public static function getUrlCategoryBottin(\stdClass $category): string
     {
+        if (self::isEconomie([$category], new BottinRepository())) {
+            return self::generateCategoryUrlCap($category);
+        }
+
         return self::getBaseUrlSite(Theme::ECONOMIE).self::BOTTIN_CATEGORY_URL.'/'.$category->slug;
     }
 
     public static function getUrlFicheBottin(\stdClass $fiche): string
     {
+        if ($url = self::generateFicheUrlCap($fiche)) {
+            return $url;
+        }
         $url = self::getBaseUrlSite(Theme::ECONOMIE).self::BOTTIN_FICHE_URL.$fiche->slug;
-      //  $who = \json_encode(debug_backtrace());
-    //    Mailer::sendError("404 url fiche: ", $fiche->societe.' \n qurl: '.$url.'who '.$who);
+        //  $who = \json_encode(debug_backtrace());
+        //    Mailer::sendError("404 url fiche: ", $fiche->societe.' \n qurl: '.$url.'who '.$who);
 
         return $url;
     }
@@ -108,5 +116,52 @@ class RouterBottin extends Router
                 return get_template_directory().'/category_bottin.php';
             }
         );
+    }
+
+    /**
+     * url pour recherche via le site de marche.
+     */
+    public static function generateFicheUrlCap(\stdClass $fiche): ?string
+    {
+        $urlBase = 'https://cap.marche.be/commerces-et-entreprises/';
+        $bottinRepository = new BottinRepository();
+        $categories = $bottinRepository->getCategoriesOfFiche($fiche->id);
+
+        //  $classementPrincipal = $bottinRepository->getCategoriePrincipale($fiche);
+        if ( ! $category = self::isEconomie($categories, $bottinRepository)) {
+            return null;
+        }
+
+        $secteur = $category->slug;
+
+        return $urlBase.$secteur.'/'.$fiche->slug;
+    }
+
+    /**
+     * url pour recherche via le site de marche.
+     */
+    public static function generateCategoryUrlCap(\stdClass $category): ?string
+    {
+        return 'https://cap.marche.be/secteur/'.$category->slug;
+    }
+
+    private static function isEconomie(array $categories, BottinRepository $bottinRepository): ?\stdClass
+    {
+        foreach ($categories as $category) {
+            if ($category->parent_id) {
+                $parent = $bottinRepository->getCategory($category->parent_id);
+                if (in_array($parent->id, Bottin::ALL)) {
+                    return $category;
+                }
+                if ($parent->parent_id) {
+                    $parent2 = $bottinRepository->getCategory($parent->parent_id);
+                    if (in_array($parent2->id, Bottin::ALL)) {
+                        return $category;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
