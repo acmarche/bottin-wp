@@ -12,10 +12,7 @@ use PDOStatement;
 
 class BottinRepository
 {
-    /**
-     * @var PDO
-     */
-    private $dbh;
+    private \PDO $dbh;
 
     public function __construct()
     {
@@ -30,7 +27,7 @@ class BottinRepository
         $this->dbh = new PDO($dsn, $username, $password, $options);
     }
 
-    public function getClassementsFiche(int $ficheId): array
+    public function getClassementsFiche(int $ficheId): array|bool
     {
         $sql   = 'SELECT * FROM classements WHERE `fiche_id` = '.$ficheId.' ORDER BY `principal` DESC ';
         $query = $this->execQuery($sql);
@@ -66,10 +63,10 @@ class BottinRepository
                 return null;
             }
         );
-        if (count($classementPrincipal) > 0) {
+        if ($classementPrincipal !== []) {
             return $classementPrincipal[0];
         }
-        if (count($categories) > 0) {
+        if ($categories !== []) {
             return $categories[0];
         }
 
@@ -77,12 +74,11 @@ class BottinRepository
     }
 
     /**
-     * @param int $id
      *
      * @return object|bool
      * @throws Exception
      */
-    public function getFicheById(int $id): ?object
+    public function getFicheById(int $id): bool|object
     {
         $sql   = 'SELECT * FROM fiche WHERE `id` = '.$id;
         $query = $this->execQuery($sql);
@@ -112,7 +108,7 @@ class BottinRepository
      * @return object[]
      * @throws Exception
      */
-    public function getFiches(): array
+    public function getFiches(): array|bool
     {
         $sql   = 'SELECT * FROM fiche';
         $query = $this->execQuery($sql);
@@ -121,12 +117,9 @@ class BottinRepository
     }
 
     /**
-     * @param int $id
-     *
-     * @return array
      * @throws Exception
      */
-    public function getImagesFiche(int $id): array
+    public function getImagesFiche(int $id): array|bool
     {
         $sql   = 'SELECT * FROM fiche_images WHERE `fiche_id` = '.$id.' ORDER BY `principale` DESC';
         $query = $this->execQuery($sql);
@@ -135,12 +128,9 @@ class BottinRepository
     }
 
     /**
-     * @param int $id
-     *
-     * @return array
      * @throws Exception
      */
-    public function getDocuments(int $id): array
+    public function getDocuments(int $id): array|bool
     {
         $sql   = 'SELECT * FROM document WHERE `fiche_id` = '.$id.' ORDER BY `name` DESC';
         $query = $this->execQuery($sql);
@@ -149,12 +139,9 @@ class BottinRepository
     }
 
     /**
-     * @param int $id
-     *
-     * @return array
      * @throws Exception
      */
-    public function getSituations(int $id): array
+    public function getSituations(int $id): array|bool
     {
         $sql   = 'SELECT * FROM `fiche_situation` LEFT JOIN situation ON situation.id = fiche_situation.situation_id WHERE `fiche_id` = '.$id.' ORDER BY `name` DESC';
         $query = $this->execQuery($sql);
@@ -179,7 +166,7 @@ class BottinRepository
         $images = $this->getImagesFiche($id);
         $logo   = null;
 
-        if (count($images) > 0) {
+        if ($images !== []) {
             $logo = Bottin::getUrlBottin().$id.DIRECTORY_SEPARATOR.$images[0]['image_name'];
         }
 
@@ -189,7 +176,6 @@ class BottinRepository
     /**
      * @param int $id
      *
-     * @return object|null
      * @throws Exception
      */
     public function getCategory(?int $id): ?object
@@ -208,6 +194,7 @@ class BottinRepository
 
     public function getParentxxx(int $parentId): ?object
     {
+        $id = null;
         $sql = 'SELECT * FROM category WHERE `parent_id` = '.$id;
         $sth = $this->execQuery($sql);
         if ( ! $data = $sth->fetch(PDO::FETCH_OBJ)) {
@@ -218,7 +205,6 @@ class BottinRepository
     }
 
     /**
-     * @param string $slug
      *
      * @return object|bool
      * @throws Exception
@@ -238,10 +224,9 @@ class BottinRepository
     /**
      * @param int $id
      *
-     * @return array
      * @throws Exception
      */
-    public function getCategories(?int $parentId): array
+    public function getCategories(?int $parentId): array|bool
     {
         if ($parentId == null) {
             $sql = 'SELECT * FROM category WHERE `parent_id` IS NULL';
@@ -256,10 +241,9 @@ class BottinRepository
     /**
      * @param int $id
      *
-     * @return array
      * @throws Exception
      */
-    public function getAllCategories(): array
+    public function getAllCategories(): array|bool
     {
         $sql   = 'SELECT * FROM category ORDER BY `name` ';
         $query = $this->execQuery($sql);
@@ -275,9 +259,8 @@ class BottinRepository
         }
 
         $fiches = array_merge(...$fiches);
-        $fiches = $this->sort($fiches);
 
-        return $fiches;
+        return $this->sort($fiches);
     }
 
     public function getFichesByCategory(int $id): array
@@ -292,9 +275,7 @@ class BottinRepository
         $classements = $query->fetchAll();
 
         $fiches = array_map(
-            function ($classement) {
-                return $this->getFicheById($classement['fiche_id']);
-            },
+            fn($classement) => $this->getFicheById($classement['fiche_id']),
             $classements
         );
 
@@ -303,12 +284,10 @@ class BottinRepository
             $data[$fiche->id] = $fiche;
         }
 
-        $fiches = $this->sort($data);
-
-        return $fiches;
+        return $this->sort($data);
     }
 
-    public function getTreeCategories()
+    public function getTreeCategories(): array
     {
         $categories = [];
         $roots      = $this->getCategories(null);
@@ -327,7 +306,7 @@ class BottinRepository
         return $categories;
     }
 
-    public function getTree()
+    public function getTree(): void
     {
 
     }
@@ -335,10 +314,9 @@ class BottinRepository
     /**
      * @param $sql
      *
-     * @return false|PDOStatement
      * @throws Exception
      */
-    public function execQuery($sql)
+    public function execQuery($sql): \PDOStatement|false
     {
         $query = $this->dbh->query($sql);
         $error = $this->dbh->errorInfo();
@@ -350,12 +328,10 @@ class BottinRepository
         return $query;
     }
 
-    public function getRelations(int $ficheId, array $categories)
+    public function getRelations(int $ficheId, array $categories): array
     {
         $ids             = array_map(
-            function ($category) {
-                return $category->id;
-            },
+            fn($category) => $category->id,
             $categories
         );
         $recommandations = [];

@@ -3,26 +3,25 @@
 
 namespace AcMarche\Bottin\Category;
 
+use stdClass;
 use AcMarche\Bottin\Repository\WpBottinRepository;
 use AcMarche\Bottin\Repository\BottinRepository;
 use AcMarche\Theme\Inc\Theme;
 
 class CategorySynchronizer
 {
-    private int $categoryId;
     private WpBottinRepository $wpRepository;
     private BottinRepository $bottinRepository;
     private CategoryCreator $categoryCreator;
 
-    public function __construct(int $categoryId)
+    public function __construct(private int $categoryId)
     {
-        $this->categoryId = $categoryId;
         $this->bottinRepository = new BottinRepository();
         $this->wpRepository = new WpBottinRepository();
         $this->categoryCreator = new CategoryCreator();
     }
 
-    public function synchronize()
+    public function synchronize(): void
     {
         $category = $this->bottinRepository->getCategory($this->categoryId);
         foreach (Theme::SITES as $site) {
@@ -31,7 +30,7 @@ class CategorySynchronizer
         }
     }
 
-    private function execute(\stdClass $category)
+    private function execute(stdClass $category): void
     {
         foreach ($this->wpRepository->getCategoriesWp() as $categoryWp) {
             if ($this->categoryId == $categoryWp->bottinId) {

@@ -29,7 +29,7 @@ class Bottin
         return $_ENV['DB_BOTTIN_URL'].'/bottin/documents/';
     }
 
-    public function getImageUrl()
+    public function getImageUrl(): void
     {
         //  /public/bottin/fiches/
     }

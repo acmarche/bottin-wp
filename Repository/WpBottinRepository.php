@@ -3,14 +3,16 @@
 
 namespace AcMarche\Bottin\Repository;
 
+use WP_Query;
+use WP_Post;
 use WP_Term;
 
 class WpBottinRepository
 {
-    const DATA_TYPE = 'bottin_fiche';
-    const DATA_KEY = 'bottin_fiche_id';
+    public const DATA_TYPE = 'bottin_fiche';
+    public const DATA_KEY = 'bottin_fiche_id';
 
-    public static function set_table_meta()
+    public static function set_table_meta(): string
     {
         global $wpdb;
         $wpdb->bottin_fichemeta = $wpdb->prefix.self::DATA_TYPE.'meta';
@@ -59,7 +61,7 @@ class WpBottinRepository
      */
     public function getFichesWp(): array
     {
-        $query = new \WP_Query(
+        $query = new WP_Query(
             array(
                 'post_status' => 'publish',
                 'post_type' => self::DATA_TYPE,
@@ -72,10 +74,10 @@ class WpBottinRepository
         return $query->get_posts();
     }
 
-    public function getFichesWpToDelete(array $bottinIds)
+    public function getFichesWpToDelete(array $bottinIds): array
     {
         $posts = $this->getFichesWp();
-        $this->set_table_meta();
+        static::set_table_meta();
         $postsId = [];
 
         foreach ($posts as $post) {
@@ -90,8 +92,9 @@ class WpBottinRepository
 
     public function getPostIdByFicheId(int $ficheId): int
     {
+        $result = [];
         global $wpdb;
-        $table = $this->set_table_meta();
+        $table = static::set_table_meta();
 
         $results = $wpdb->get_results(
             $wpdb->prepare(
@@ -101,33 +104,26 @@ class WpBottinRepository
             )
         );
 
-        if (count($results) > 0) {
+        if ((is_countable($results) ? count($results) : 0) > 0) {
             $key = WpBottinRepository::DATA_KEY;
             $result['status'] = "updated";
-            $ID = $results[0]->$key;
 
-            return $ID;
+            return $results[0]->$key;
         }
 
         return 0;
     }
 
-    /**
-     * @param int $postId
-     * @return bool|int
-     */
-    public function deleteMetaData(int $postId)
+    public function deleteMetaData(int $postId): bool|int
     {
         global $wpdb;
-        $table = $this->set_table_meta();
+        $table = static::set_table_meta();
 
-        $results = $wpdb->delete(
+        return $wpdb->delete(
             $table,
             [WpBottinRepository::DATA_KEY => $postId],
             ['%d']
         );
-
-        return $results;
     }
 
     public function getFicheIdByPostId(int $postId): int
@@ -137,12 +133,10 @@ class WpBottinRepository
         return get_metadata(WpBottinRepository::DATA_TYPE, $postId, 'id', true);
     }
 
-    public function getPostByFicheId(int $ficheId): ?\WP_Post
+    public function getPostByFicheId(int $ficheId): ?WP_Post
     {
-        if ($postId = $this->getPostIdByFicheId($ficheId)) {
-            $post = get_post($postId);
-
-            return $post;
+        if (($postId = $this->getPostIdByFicheId($ficheId)) !== 0) {
+            return get_post($postId);
         }
 
         return null;
@@ -156,16 +150,14 @@ class WpBottinRepository
     public function getFicheMetaDatas(int $idFiche)
     {
         global $wpdb;
-        $table = $this->set_table_meta();
+        $table = static::set_table_meta();
         $key = self::DATA_KEY;
 
-        $results = $wpdb->get_results(
+        return $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT * FROM $table WHERE `$key` = '%d'",
                 (int)$idFiche
             )
         );
-
-        return $results;
     }
 }

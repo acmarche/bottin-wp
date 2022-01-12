@@ -3,6 +3,7 @@
 
 namespace AcMarche\Bottin\Command;
 
+use WP_Term;
 use AcMarche\Theme\Inc\Theme;
 use AcMarche\Theme\Lib\Menu;
 use Symfony\Component\Console\Command\Command;
@@ -15,7 +16,7 @@ class AddItemCommand extends Command
     protected static $defaultName = 'menu:additem';
     private SymfonyStyle $io;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Ajout menu bottin');
@@ -25,7 +26,7 @@ class AddItemCommand extends Command
     {
         $this->io = new SymfonyStyle($input, $output);
         $menu     = new Menu();
-        foreach (Theme::SITES as $siteId => $slug) {
+        foreach (array_keys(Theme::SITES) as $siteId) {
             switch_to_blog($siteId);
             $items = $menu->getItems($siteId);
             $found = false;
@@ -34,7 +35,7 @@ class AddItemCommand extends Command
                     $found = true;
                 }
             }
-            if ($found === false) {
+            if (!$found) {
                 $menuSite = wp_get_nav_menu_object(Menu::MENU_NAME);
              //   $this->addItem($siteId, $slug, $menuSite);
             }
@@ -44,7 +45,7 @@ class AddItemCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function addItem(int $siteId, string $slug, \WP_Term $menu)
+    private function addItem(int $siteId, string $slug, WP_Term $menu): void
     {
         if ($siteId === 1) {
             $slug = '';

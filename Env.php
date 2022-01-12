@@ -2,6 +2,7 @@
 
 namespace AcMarche\Bottin;
 
+use Exception;
 use Symfony\Component\Dotenv\Dotenv;
 
 class Env
@@ -11,7 +12,7 @@ class Env
         $dotenv = new Dotenv();
         try {
             $dotenv->load(ABSPATH . '.env');
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             echo "error load env: " . $exception->getMessage();
         }
     }
