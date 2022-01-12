@@ -1,7 +1,13 @@
 {
   "name": "acmarche/bottin-wp",
+  "authors": [
+    {
+      "name": "jfsenechal",
+      "email": "jfsenechal@gmail.com"
+    }
+  ],
   "require": {
-    "php": "^7.4",
+    "php": ">=8.0",
     "ext-json": "*",
     "ext-curl": "*",
     "symfony/http-foundation": "^5.3",
