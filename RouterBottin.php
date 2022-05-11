@@ -150,12 +150,12 @@ class RouterBottin extends Router
     private static function isEconomie(array $categories, BottinRepository $bottinRepository): ?stdClass
     {
         foreach ($categories as $category) {
-            if ($category->parent_id) {
+            if (isset($category->parent_id)) {
                 $parent = $bottinRepository->getCategory($category->parent_id);
                 if (in_array($parent->id, Bottin::ALL)) {
                     return $category;
                 }
-                if ($parent->parent_id) {
+                if (isset($parent->parent_id)) {
                     $parent2 = $bottinRepository->getCategory($parent->parent_id);
                     if (in_array($parent2->id, Bottin::ALL)) {
                         return $category;
