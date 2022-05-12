@@ -22,7 +22,7 @@ class Twig
         $environment = new Environment(
             $loader,
             [
-                'cache'            => ABSPATH.'var/cache',
+                'cache'            => __DIR__.'var/cache',
                 'debug'            => $debug,
                 'strict_variables' => $debug,
             ]
