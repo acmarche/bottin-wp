@@ -5,6 +5,7 @@ namespace AcMarche\Bottin\Elasticsearch;
 use AcMarche\Bottin\Elasticsearch\Data\DocumentElastic;
 use AcMarche\Bottin\Elasticsearch\Data\ElasticData;
 use AcMarche\Common\AcSerializer;
+use AcMarche\Common\Cache;
 use AcMarche\Pivot\DependencyInjection\Kernel;
 use AcMarche\Theme\Inc\Theme;
 use Elastica\Document;
@@ -14,14 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use WP_Post;
 use function switch_to_blog;
 
-if ( ! defined('ABSPATH')) {
-    define('ABSPATH', Kernel::getDir());
-}
-if ( ! defined('WP_USE_THEMES')) {
-    define('WP_USE_THEMES', false);
-}
-$_SERVER['HTTP_HOST'] = 'www.marche.be';
-require_once ABSPATH.'wp-load.php';
+Cache::initLoaderWp();
 
 class ElasticIndexer
 {
