@@ -1,0 +1,99 @@
+mappings:
+  properties:
+    nametest:
+      type: text
+      analyzer: app_french_light
+    title:
+      type: text
+      analyzer: english
+      fields:
+        autocomplete:
+          type: text
+          analyzer: app_autocomplete
+          search_analyzer: standard
+    name2:
+      type: text
+      fields:
+        keywordstring:
+          type: text
+          analyzer: keyword_analyzer
+        edgengram:
+          type: text
+          analyzer: edge_ngram_analyzer
+          search_analyzer: edge_ngram_search_analyzer
+        completion:
+          type: completion
+      analyzer: standard
+    type:
+      type: keyword
+    blog:
+      type: text
+      index: false
+    date:
+      type: date
+      format: strict_date_optional_time||epoch_millis
+    guid:
+      type: text
+      index: false
+    permalink:
+      type: text
+      index: false
+    post_ID:
+      type: long
+      index: false
+    content:
+      type: text
+      analyzer: app_french_light
+      fields:
+        stemmed:
+          type: text
+          analyzer: app_french_heavy
+    post_date:
+      type: date
+      format: strict_date_optional_time||epoch_millis
+    excerpt:
+      type: text
+      analyzer: app_french_light
+      fields:
+        stemmed:
+          type: text
+          analyzer: app_french_heavy
+    post_name:
+      type: text
+      index: false
+    name:
+      type: text
+      analyzer: app_french_light
+      boost: 2
+      fields:
+        stemmed:
+          type: text
+          analyzer: app_french_heavy
+    post_suggest:
+      type: completion
+      analyzer: standard
+      search_analyzer: simple
+    post_autocomplete:
+      type: text
+      analyzer: standard
+      search_analyzer: standard
+    categories:
+      properties:
+        cat_name:
+          type: text
+          analyzer: french
+        cat_name_autocomplete:
+          type: text
+          analyzer: standard
+          search_analyzer: standard
+        cat_description:
+          type: text
+          analyzer: app_french_light
+          fields:
+            stemmed:
+              type: text
+              analyzer: app_french_heavy
+    post_mime_type:
+      type: text
+    post_status:
+      type: text

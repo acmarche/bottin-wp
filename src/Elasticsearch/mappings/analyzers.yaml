@@ -1,0 +1,65 @@
+filter:
+  app_french_stemmer:
+    type: stemmer
+    language: light_french
+  app_french_elision:
+    type: elision
+    articles_case: true
+    articles:
+      - l
+      - m
+      - t
+      - qu
+      - n
+      - s
+      - j
+      - d
+      - c
+      - jusqu
+      - quoiqu
+      - lorsqu
+      - puisqu
+  app_autocomplete_filter:
+    type: edge_ngram
+    min_gram: 1
+    max_gram: 20
+analyzer:
+  app_french_heavy:
+    tokenizer: icu_tokenizer
+    filter:
+      - app_french_elision
+      - icu_folding
+      - app_french_stemmer
+  app_french_light:
+    tokenizer: icu_tokenizer
+    filter:
+      - app_french_elision
+      - icu_folding
+  app_autocomplete:
+    type: custom
+    tokenizer: standard
+    filter: [ lowercase, asciifolding, elision, app_autocomplete_filter ]
+  keyword_analyzer:
+    filter: [
+        lowercase,
+        asciifolding,
+        trim
+    ]
+    char_filter: [ ]
+    type: custom
+    tokenizer: keyword
+  edge_ngram_analyzer:
+    filter: [
+        lowercase
+    ]
+    tokenizer: edge_ngram_tokenizer
+  edge_ngram_search_analyzer:
+    tokenizer: lowercase
+tokenizer:
+  edge_ngram_tokenizer:
+    type: edge_ngram
+    min_gram: 2
+    max_gram: 5
+    token_chars: [
+        letter
+    ]

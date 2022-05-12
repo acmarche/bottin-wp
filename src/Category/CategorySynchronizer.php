@@ -3,10 +3,10 @@
 
 namespace AcMarche\Bottin\Category;
 
-use stdClass;
-use AcMarche\Bottin\Repository\WpBottinRepository;
 use AcMarche\Bottin\Repository\BottinRepository;
+use AcMarche\Bottin\Repository\WpBottinRepository;
 use AcMarche\Theme\Inc\Theme;
+use stdClass;
 
 class CategorySynchronizer
 {

@@ -8,7 +8,6 @@ use AcMarche\Bottin\RouterBottin;
 use AcMarche\Common\Mailer;
 use Exception;
 use PDO;
-use PDOStatement;
 
 class BottinRepository
 {

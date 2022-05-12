@@ -3,10 +3,10 @@
 
 namespace AcMarche\Bottin;
 
-use stdClass;
 use AcMarche\Bottin\Repository\BottinRepository;
 use AcMarche\Common\Router;
 use AcMarche\Theme\Inc\Theme;
+use stdClass;
 
 class RouterBottin extends Router
 {

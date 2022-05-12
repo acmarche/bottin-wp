@@ -3,11 +3,9 @@
 
 namespace AcMarche\Bottin\Category;
 
-use WP_Term;
 use stdClass;
+use WP_Term;
 use function wp_update_category;
-
-include __DIR__ . '/wp-admin/includes/taxonomy.php';//?? sinon reconnais pas la fonction wp_update_category
 
 class CategoryCreator
 {

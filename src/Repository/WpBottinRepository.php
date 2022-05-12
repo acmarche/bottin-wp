@@ -3,8 +3,8 @@
 
 namespace AcMarche\Bottin\Repository;
 
-use WP_Query;
 use WP_Post;
+use WP_Query;
 use WP_Term;
 
 class WpBottinRepository
