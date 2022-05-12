@@ -3,6 +3,7 @@
 
 namespace AcMarche\Bottin;
 
+use AcMarche\Pivot\DependencyInjection\Kernel;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Extra\String\StringExtension;
@@ -18,11 +19,12 @@ class Twig
         }
 
         $loader = new FilesystemLoader($path);
+        $dir = Kernel::getDir();
 
         $environment = new Environment(
             $loader,
             [
-                'cache'            => __DIR__.'var/cache',
+                'cache'            => $dir.'var/cache',
                 'debug'            => $debug,
                 'strict_variables' => $debug,
             ]
@@ -30,8 +32,8 @@ class Twig
 
         if ($debug) {
             $environment->addExtension(new DebugExtension());
-            $environment->addExtension(new StringExtension());
         }
+        $environment->addExtension(new StringExtension());
 
         $environment->addGlobal('template_directory', get_template_directory_uri());
 
