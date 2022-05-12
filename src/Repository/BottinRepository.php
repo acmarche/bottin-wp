@@ -6,6 +6,7 @@ use AcMarche\Bottin\Bottin;
 use AcMarche\Bottin\Env;
 use AcMarche\Bottin\RouterBottin;
 use AcMarche\Common\Mailer;
+use AcMarche\Theme\Inc\Theme;
 use Exception;
 use PDO;
 
@@ -70,6 +71,28 @@ class BottinRepository
         }
 
         return null;
+    }
+
+    public function findSiteFiche(object $fiche): int
+    {
+        if ($classementPrincipal = $this->getCategoriePrincipale($fiche)) {
+            list($vide, $root) = explode('/', $classementPrincipal->materialized_path);
+            if ($root) {
+                return match ($root) {
+                    '485' => Theme::TOURISME,
+                    '486' => Theme::SPORT,
+                    '487' => Theme::SOCIAL,
+                    '488' => Theme::SANTE,
+                    '511' => Theme::ECONOMIE,
+                    '663' => Theme::CULTURE,
+                    '664' => Theme::ADMINISTRATION,
+                    '671' => Theme::ENFANCE,
+                    default => Theme::CITOYEN,
+                };
+            }
+        }
+
+        return Theme::CITOYEN;
     }
 
     /**
@@ -193,7 +216,7 @@ class BottinRepository
 
     public function getParentxxx(int $parentId): ?object
     {
-        $id = null;
+        $id  = null;
         $sql = 'SELECT * FROM category WHERE `parent_id` = '.$id;
         $sth = $this->execQuery($sql);
         if ( ! $data = $sth->fetch(PDO::FETCH_OBJ)) {
@@ -336,10 +359,11 @@ class BottinRepository
         $recommandations = [];
         $fiches          = $this->getFichesByCategories($ids);
         foreach ($fiches as $fiche) {
+            $idSite = $this->findSiteFiche($fiche);
             if ($fiche->id != $ficheId) {
                 $recommandations[] = [
                     'title' => $fiche->societe,
-                    'url'   => RouterBottin::getUrlFicheBottin($fiche),
+                    'url'   => RouterBottin::getUrlFicheBottin($idSite, $fiche),
                     'image' => $this->getLogo($fiche->id),
                 ];
             }

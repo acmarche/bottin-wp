@@ -25,21 +25,19 @@ class RouterBottin extends Router
     public static function getUrlCategoryBottin(stdClass $category): ?string
     {
         if (self::isEconomie([$category], new BottinRepository()) !== null) {
-            return self::generateCategoryUrlCap($category,new BottinRepository());
+            return self::generateCategoryUrlCap($category, new BottinRepository());
         }
 
         return self::getBaseUrlSite(Theme::ECONOMIE).self::BOTTIN_CATEGORY_URL.'/'.$category->slug;
     }
 
-    public static function getUrlFicheBottin(stdClass $fiche): string
+    public static function getUrlFicheBottin(int $blogId, stdClass $fiche): string
     {
         if ($url = self::generateFicheUrlCap($fiche)) {
             return $url;
         }
-        //  $who = \json_encode(debug_backtrace());
-        //    Mailer::sendError("404 url fiche: ", $fiche->societe.' \n qurl: '.$url.'who '.$who);
 
-        return self::getBaseUrlSite(Theme::ECONOMIE).self::BOTTIN_FICHE_URL.$fiche->slug;
+        return self::getBaseUrlSite($blogId).self::BOTTIN_FICHE_URL.$fiche->slug;
     }
 
     public function addRouteBottin(): void
@@ -126,9 +124,9 @@ class RouterBottin extends Router
         $urlBase = 'https://cap.marche.be/commerces-et-entreprises/';
         $bottinRepository = new BottinRepository();
         $categories = $bottinRepository->getCategoriesOfFiche($fiche->id);
-
+        $idSite = $bottinRepository->findSiteFiche($fiche);
         //  $classementPrincipal = $bottinRepository->getCategoriePrincipale($fiche);
-        if ( ($category = self::isEconomie($categories, $bottinRepository)) === null) {
+        if (($category = self::isEconomie($categories, $bottinRepository)) === null) {
             return null;
         }
 

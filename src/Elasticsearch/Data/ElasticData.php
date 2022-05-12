@@ -290,6 +290,7 @@ class ElasticData
         foreach ($fiches as $fiche) {
 
             $categories = $this->bottinData->getCategoriesFiche($fiche);
+            $idSite     = $this->bottinRepository->findSiteFiche($fiche);
 
             $document          = new DocumentElastic();
             $document->id      = $fiche->id;
@@ -299,7 +300,7 @@ class ElasticData
             $document->tags    = $categories;
             list($date, $heure) = explode(' ', $fiche->created_at);
             $document->date = $date;
-            $document->url  = RouterBottin::getUrlFicheBottin($fiche);
+            $document->url  = RouterBottin::getUrlFicheBottin($idSite, $fiche);
             $documents[]    = $document;
         }
 
@@ -325,7 +326,7 @@ class ElasticData
             $document->date    = $created[0];
             $document->url     = RouterBottin::getUrlCategoryBottin($category);
             $fiches            = $this->bottinRepository->getFichesByCategory($category->id);
-            $document->count    = count($fiches);
+            $document->count   = count($fiches);
             $document->content = $this->bottinData->getContentForCategory($fiches);
             $categories[]      = $document;
         }
