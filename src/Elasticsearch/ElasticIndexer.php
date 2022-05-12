@@ -51,6 +51,7 @@ class ElasticIndexer
                 $this->outPut->section($nom);
             }
             $documentElastics = $this->elasticData->getPosts();
+            dump(count($documentElastics));
             foreach ($documentElastics as $documentElastic) {
                 if ($this->outPut) {
                     $this->outPut->writeln($documentElastic->name);
