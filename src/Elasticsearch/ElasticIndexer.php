@@ -14,15 +14,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 use WP_Post;
 use function switch_to_blog;
 
-if ( ! defined('ABSPATH')) {
-    define('ABSPATH', Kernel::getDir());
-}
-if ( ! defined('WP_USE_THEMES')) {
-    define('WP_USE_THEMES', false);
-}
-$_SERVER['HTTP_HOST'] = 'www.marche.be';
-require_once ABSPATH.'wp-load.php';
-
 class ElasticIndexer
 {
     use ElasticClientTrait;
@@ -51,7 +42,6 @@ class ElasticIndexer
                 $this->outPut->section($nom);
             }
             $documentElastics = $this->elasticData->getPosts();
-            dump(count($documentElastics));
             foreach ($documentElastics as $documentElastic) {
                 if ($this->outPut) {
                     $this->outPut->writeln($documentElastic->name);

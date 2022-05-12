@@ -14,10 +14,7 @@ class ElasticSearcherCommand extends Command
 {
     protected static $defaultName = 'elastic:search';
 
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
+    private SymfonyStyle $io;
 
     protected function configure()
     {

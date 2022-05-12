@@ -13,10 +13,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class ElasticServerCommand extends Command
 {
     protected static $defaultName = 'elastic:server';
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
+
+    private SymfonyStyle $io;
 
     protected function configure()
     {
