@@ -17,7 +17,9 @@ use function switch_to_blog;
 if ( ! defined('ABSPATH')) {
     define('ABSPATH', Kernel::getDir());
 }
-define('WP_USE_THEMES', false);
+if ( ! defined('WP_USE_THEMES')) {
+    define('WP_USE_THEMES', false);
+}
 $_SERVER['HTTP_HOST'] = 'www.marche.be';
 require_once ABSPATH.'wp-load.php';
 
