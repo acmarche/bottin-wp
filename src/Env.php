@@ -13,6 +13,7 @@ class Env
         $dir = Kernel::getDir();
         $dotenv = new Dotenv();
         try {
+            // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
             $dotenv->load($dir . '.env');
         } catch (Exception $exception) {
             echo "error load env: " . $exception->getMessage();
