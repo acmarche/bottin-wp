@@ -101,12 +101,12 @@ class ElasticData
     {
         $content = '';
         if (get_current_blog_id() == Theme::ADMINISTRATION) {
-            if ($categoryId == Theme::ENQUETE_DIRECTORY) {
+            if ($categoryId == Theme::ENQUETE_DIRECTORY_URBA) {
                 /*  foreach (Urba::getEnquetesPubliques() as $permis) {
                       $document = $this->createDocumentElasticFromPermis($permis);
                       $content  .= $document->name.' '.$document->excerpt.' '.$document->content;
                   }*/
-                foreach (WpRepository::getEnquetesPubliques() as $permis) {
+                foreach (WpRepository::getEnquetesPubliques($categoryId) as $permis) {
                     $document = $this->createDocumentElasticFromEnquete($permis);
                     $content  .= $document->name.' '.$document->excerpt.' '.$document->content;
                 }
