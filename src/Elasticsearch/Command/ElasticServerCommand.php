@@ -4,22 +4,24 @@
 namespace AcMarche\Bottin\Elasticsearch\Command;
 
 use AcMarche\Bottin\Elasticsearch\ElasticServer;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: 'elastic:server',
+    description: 'Raz l\'index',
+)]
 class ElasticServerCommand extends Command
 {
-    protected static $defaultName = 'elastic:server';
-
     private SymfonyStyle $io;
 
     protected function configure()
     {
-        $this
-            ->setDescription('Raz l\'index');
+
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

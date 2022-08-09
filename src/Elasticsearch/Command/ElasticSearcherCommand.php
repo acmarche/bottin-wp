@@ -4,22 +4,24 @@
 namespace AcMarche\Bottin\Elasticsearch\Command;
 
 use AcMarche\Bottin\Elasticsearch\Searcher;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: 'elastic:search',
+    description: 'Effectuer une recherche',
+)]
 class ElasticSearcherCommand extends Command
 {
-    protected static $defaultName = 'elastic:search';
-
     private SymfonyStyle $io;
 
     protected function configure()
     {
         $this
-            ->setDescription('Effectuer une recherche')
             ->addArgument('query', InputArgument::REQUIRED, 'mot clef pour la description');
     }
 

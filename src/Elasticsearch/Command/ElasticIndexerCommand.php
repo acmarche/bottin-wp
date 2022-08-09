@@ -5,22 +5,24 @@ namespace AcMarche\Bottin\Elasticsearch\Command;
 
 use AcMarche\Bottin\Elasticsearch\ElasticIndexer;
 use AcMarche\Common\Cache;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: 'elastic:indexer',
+    description: 'Mise à jour des données [all, posts, categories, bottin, enquetes]',
+)]
 class ElasticIndexerCommand extends Command
 {
-    protected static $defaultName = 'elastic:indexer';
-
     private  SymfonyStyle$io;
 
     protected function configure()
     {
         $this
-            ->setDescription('Mise à jour des données [all, posts, categories, bottin, enquetes]')
             ->addArgument('action', InputArgument::REQUIRED, 'all, posts, categories, bottin');
     }
 

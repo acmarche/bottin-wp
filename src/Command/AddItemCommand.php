@@ -5,15 +5,19 @@ namespace AcMarche\Bottin\Command;
 
 use AcMarche\Theme\Inc\Theme;
 use AcMarche\Theme\Lib\Menu;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use WP_Term;
 
+#[AsCommand(
+    name: 'menu:additem',
+    description: ' ',
+)]
 class AddItemCommand extends Command
 {
-    protected static $defaultName = 'menu:additem';
     private SymfonyStyle $io;
 
     protected function configure(): void
