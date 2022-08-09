@@ -2,12 +2,19 @@
 
 namespace AcMarche\Bottin;
 
-use AcMarche\Pivot\DependencyInjection\PivotContainer;
+use Exception;
+use Symfony\Component\Dotenv\Dotenv;
 
 class Env
 {
     public static function loadEnv(): void
     {
-        PivotContainer::init();
+        $dotenv = new Dotenv();
+        try {
+            // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
+            $dotenv->load(ABSPATH. '.env');
+        } catch (Exception $exception) {
+            echo "error load env: " . $exception->getMessage();
+        }
     }
 }

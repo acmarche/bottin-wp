@@ -19,12 +19,11 @@ class Twig
         }
 
         $loader = new FilesystemLoader($path);
-        $dir = Kernel::getDir();
 
         $environment = new Environment(
             $loader,
             [
-                'cache'            => $dir.'var/cache',
+                'cache'            => ABSPATH.'var/cache',
                 'debug'            => $debug,
                 'strict_variables' => $debug,
             ]
