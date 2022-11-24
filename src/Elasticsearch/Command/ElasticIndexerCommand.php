@@ -28,6 +28,7 @@ class ElasticIndexerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        define('ABSPATH', dirname(__DIR__).'/../../../../../');
         Cache::initLoaderWp();
         $action   = $input->getArgument('action');
         $this->io = new SymfonyStyle($input, $output);
