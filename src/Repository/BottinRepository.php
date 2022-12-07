@@ -4,8 +4,8 @@ namespace AcMarche\Bottin\Repository;
 
 use AcMarche\Bottin\Bottin;
 use AcMarche\Bottin\Env;
+use AcMarche\Bottin\Mailer;
 use AcMarche\Bottin\RouterBottin;
-use AcMarche\Common\Mailer;
 use AcMarche\Theme\Inc\Theme;
 use Exception;
 use PDO;

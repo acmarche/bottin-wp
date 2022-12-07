@@ -4,11 +4,10 @@
 namespace AcMarche\Bottin;
 
 use AcMarche\Bottin\Repository\BottinRepository;
-use AcMarche\Common\Router;
-use AcMarche\Theme\Inc\Theme;
+use AcMarche\MarcheTail\Inc\Theme;
 use stdClass;
 
-class RouterBottin extends Router
+class RouterBottin
 {
     public const PARAM_BOTTIN_FICHE = 'slugfiche';
     public const PARAM_BOTTIN_CATEGORY = 'slugcategory';
@@ -20,6 +19,50 @@ class RouterBottin extends Router
         //   $this->flushRoutes();
         $this->addRouteBottin();
         $this->addRouteBottinCategory();
+    }
+
+    /**
+     * Retourne la base du blog (/economie/, /sante/, /culture/...
+     *
+     *
+     */
+    public static function getBaseUrlSite(?int $blodId = null): string
+    {
+        if (is_multisite()) {
+            if ( ! $blodId) {
+                $blodId = Theme::CITOYEN;
+            }
+
+            return get_blog_details($blodId)->path;
+        }
+
+        return '/';
+    }
+
+    public function flushRoutes()
+    {
+        if (is_multisite()) {
+            $current = get_current_blog_id();
+            foreach (get_sites(['fields' => 'ids']) as $site) {
+                switch_to_blog($site);
+                flush_rewrite_rules();
+            }
+            switch_to_blog($current);
+        } else {
+            flush_rewrite_rules();
+        }
+    }
+
+    public static function getCurrentUrl(): string
+    {
+        global $wp;
+
+        return home_url($wp->request);
+    }
+
+    public static function getReferer(): string
+    {
+        return wp_get_referer();
     }
 
     public static function getUrlCategoryBottin(stdClass $category): ?string

@@ -4,9 +4,7 @@ namespace AcMarche\Bottin\Elasticsearch;
 
 use AcMarche\Bottin\Elasticsearch\Data\DocumentElastic;
 use AcMarche\Bottin\Elasticsearch\Data\ElasticData;
-use AcMarche\Common\AcSerializer;
-use AcMarche\Pivot\DependencyInjection\Kernel;
-use AcMarche\Theme\Inc\Theme;
+use AcMarche\MarcheTail\Inc\Theme;
 use Elastica\Document;
 use Elastica\Response;
 use Symfony\Component\Console\Style\SymfonyStyle;

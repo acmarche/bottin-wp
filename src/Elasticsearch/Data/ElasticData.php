@@ -3,12 +3,12 @@
 namespace AcMarche\Bottin\Elasticsearch\Data;
 
 use AcMarche\Bottin\Bottin;
+use AcMarche\Bottin\Mailer;
 use AcMarche\Bottin\Repository\BottinRepository;
 use AcMarche\Bottin\RouterBottin;
-use AcMarche\Common\Mailer;
-use AcMarche\Theme\Inc\RouterMarche;
-use AcMarche\Theme\Inc\Theme;
-use AcMarche\Theme\Lib\WpRepository;
+use AcMarche\MarcheTail\Inc\RouterMarche;
+use AcMarche\MarcheTail\Inc\Theme;
+use AcMarche\MarcheTail\Lib\WpRepository;
 use AcMarche\UrbaWeb\Entity\Permis;
 use BottinCategoryMetaBox;
 use Symfony\Component\Console\Style\SymfonyStyle;

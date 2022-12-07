@@ -2,7 +2,7 @@
 
 namespace AcMarche\Bottin\Elasticsearch;
 
-use AcMarche\Common\Env;
+use AcMarche\Bottin\Env;
 use Elastica\Client;
 use Elastica\Index;
 

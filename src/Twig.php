@@ -3,7 +3,6 @@
 
 namespace AcMarche\Bottin;
 
-use AcMarche\Pivot\DependencyInjection\Kernel;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Extra\String\StringExtension;
