@@ -6,7 +6,7 @@ use AcMarche\Bottin\Bottin;
 use AcMarche\Bottin\Env;
 use AcMarche\Bottin\Mailer;
 use AcMarche\Bottin\RouterBottin;
-use AcMarche\Theme\Inc\Theme;
+use AcMarche\MarcheTail\Inc\Theme;
 use Exception;
 use PDO;
 
