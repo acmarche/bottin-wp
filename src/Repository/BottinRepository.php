@@ -7,6 +7,7 @@ use AcMarche\Bottin\Env;
 use AcMarche\Bottin\Mailer;
 use AcMarche\Bottin\RouterBottin;
 use AcMarche\MarcheTail\Inc\Theme;
+use AcMarche\Theme\Entity\CommonItem;
 use Exception;
 use PDO;
 
@@ -17,10 +18,10 @@ class BottinRepository
     public function __construct()
     {
         Env::loadEnv();
-        $dsn      = 'mysql:host=localhost;dbname=bottin';
+        $dsn = 'mysql:host=localhost;dbname=bottin';
         $username = $_ENV['DB_BOTTIN_USER'];
         $password = $_ENV['DB_BOTTIN_PASS'];
-        $options  = array(
+        $options = array(
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
         );
 
@@ -29,7 +30,7 @@ class BottinRepository
 
     public function getClassementsFiche(int $ficheId): array|bool
     {
-        $sql   = 'SELECT * FROM classements WHERE `fiche_id` = '.$ficheId.' ORDER BY `principal` DESC ';
+        $sql = 'SELECT * FROM classements WHERE `fiche_id` = '.$ficheId.' ORDER BY `principal` DESC ';
         $query = $this->execQuery($sql);
 
         return $query->fetchAll();
@@ -37,13 +38,13 @@ class BottinRepository
 
     public function getCategoriesOfFiche(int $ficheId): array
     {
-        $categories  = [];
+        $categories = [];
         $classements = $this->getClassementsFiche($ficheId);
         foreach ($classements as $classement) {
             $category = $this->getCategory($classement['category_id']);
             if ($category) {
                 $category->principal = $classement['principal'];
-                $categories[]        = $category;
+                $categories[] = $category;
             }
         }
 
@@ -52,7 +53,7 @@ class BottinRepository
 
     public function getCategoriePrincipale(object $fiche): ?object
     {
-        $categories          = $this->getCategoriesOfFiche($fiche->id);
+        $categories = $this->getCategoriesOfFiche($fiche->id);
         $classementPrincipal = array_filter(
             $categories,
             function ($category) {
@@ -102,7 +103,7 @@ class BottinRepository
      */
     public function getFicheById(int $id): bool|object
     {
-        $sql   = 'SELECT * FROM fiche WHERE `id` = '.$id;
+        $sql = 'SELECT * FROM fiche WHERE `id` = '.$id;
         $query = $this->execQuery($sql);
 
         return $query->fetch(PDO::FETCH_OBJ);
@@ -119,7 +120,7 @@ class BottinRepository
         $sql = 'SELECT * FROM fiche WHERE `slug` = :slug ';
         $sth = $this->dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute(array(':slug' => $slug));
-        if ( ! $data = $sth->fetch(PDO::FETCH_OBJ)) {
+        if (!$data = $sth->fetch(PDO::FETCH_OBJ)) {
             return null;
         }
 
@@ -132,7 +133,7 @@ class BottinRepository
      */
     public function getFiches(): array|bool
     {
-        $sql   = 'SELECT * FROM fiche';
+        $sql = 'SELECT * FROM fiche';
         $query = $this->execQuery($sql);
 
         return $query->fetchAll(PDO::FETCH_OBJ);
@@ -143,7 +144,7 @@ class BottinRepository
      */
     public function getImagesFiche(int $id): array|bool
     {
-        $sql   = 'SELECT * FROM fiche_images WHERE `fiche_id` = '.$id.' ORDER BY `principale` DESC';
+        $sql = 'SELECT * FROM fiche_images WHERE `fiche_id` = '.$id.' ORDER BY `principale` DESC';
         $query = $this->execQuery($sql);
 
         return $query->fetchAll();
@@ -154,7 +155,7 @@ class BottinRepository
      */
     public function getDocuments(int $id): array|bool
     {
-        $sql   = 'SELECT * FROM document WHERE `fiche_id` = '.$id.' ORDER BY `name` DESC';
+        $sql = 'SELECT * FROM document WHERE `fiche_id` = '.$id.' ORDER BY `name` DESC';
         $query = $this->execQuery($sql);
 
         return $query->fetchAll();
@@ -165,7 +166,7 @@ class BottinRepository
      */
     public function getSituations(int $id): array|bool
     {
-        $sql   = 'SELECT * FROM `fiche_situation` LEFT JOIN situation ON situation.id = fiche_situation.situation_id WHERE `fiche_id` = '.$id.' ORDER BY `name` DESC';
+        $sql = 'SELECT * FROM `fiche_situation` LEFT JOIN situation ON situation.id = fiche_situation.situation_id WHERE `fiche_id` = '.$id.' ORDER BY `name` DESC';
         $query = $this->execQuery($sql);
 
         return $query->fetchAll();
@@ -186,7 +187,7 @@ class BottinRepository
     public function getLogo(int $id): ?string
     {
         $images = $this->getImagesFiche($id);
-        $logo   = null;
+        $logo = null;
 
         if ($images !== []) {
             $logo = Bottin::getUrlBottin().$id.DIRECTORY_SEPARATOR.$images[0]['image_name'];
@@ -202,12 +203,12 @@ class BottinRepository
      */
     public function getCategory(?int $id): ?object
     {
-        if ( ! $id) {
+        if (!$id) {
             return null;
         }
         $sql = 'SELECT * FROM category WHERE `id` = '.$id;
         $sth = $this->execQuery($sql);
-        if ( ! $data = $sth->fetch(PDO::FETCH_OBJ)) {
+        if (!$data = $sth->fetch(PDO::FETCH_OBJ)) {
             return null;
         }
 
@@ -216,10 +217,10 @@ class BottinRepository
 
     public function getParentxxx(int $parentId): ?object
     {
-        $id  = null;
+        $id = null;
         $sql = 'SELECT * FROM category WHERE `parent_id` = '.$id;
         $sth = $this->execQuery($sql);
-        if ( ! $data = $sth->fetch(PDO::FETCH_OBJ)) {
+        if (!$data = $sth->fetch(PDO::FETCH_OBJ)) {
             return null;
         }
 
@@ -236,7 +237,7 @@ class BottinRepository
         $sql = 'SELECT * FROM category WHERE `slug` = :slug ';
         $sth = $this->dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute(array(':slug' => $slug));
-        if ( ! $data = $sth->fetch(PDO::FETCH_OBJ)) {
+        if (!$data = $sth->fetch(PDO::FETCH_OBJ)) {
             return null;
         }
 
@@ -267,7 +268,7 @@ class BottinRepository
      */
     public function getAllCategories(): array|bool
     {
-        $sql   = 'SELECT * FROM category ORDER BY `name` ';
+        $sql = 'SELECT * FROM category ORDER BY `name` ';
         $query = $this->execQuery($sql);
 
         return $query->fetchAll(PDO::FETCH_OBJ);
@@ -288,12 +289,12 @@ class BottinRepository
     public function getFichesByCategory(int $id): array
     {
         $category = $this->getCategory($id);
-        if ( ! $category) {
+        if (!$category) {
             Mailer::sendError('fiche non trouvée', 'categorie id: '.$id);
         }
 
-        $sql         = 'SELECT * FROM classements WHERE `category_id` = '.$id;
-        $query       = $this->execQuery($sql);
+        $sql = 'SELECT * FROM classements WHERE `category_id` = '.$id;
+        $query = $this->execQuery($sql);
         $classements = $query->fetchAll();
 
         $fiches = array_map(
@@ -312,15 +313,15 @@ class BottinRepository
     public function getTreeCategories(): array
     {
         $categories = [];
-        $roots      = $this->getCategories(null);
+        $roots = $this->getCategories(null);
         foreach ($roots as $root) {
             $categories[$root->id][0] = $root;
-            $levels1                  = $this->getCategories($root->id);
+            $levels1 = $this->getCategories($root->id);
             $categories[$root->id][1] = $levels1;
 
             foreach ($levels1 as $level) {
-                $categories[$root->id][0]    = $level;
-                $level2                      = $this->getCategories($level->id);
+                $categories[$root->id][0] = $level;
+                $level2 = $this->getCategories($level->id);
                 $categories[$root->id][1][2] = $level2;
             }
         }
@@ -352,20 +353,27 @@ class BottinRepository
 
     public function getRelations(int $ficheId, array $categories): array
     {
-        $ids             = array_map(
+        $ids = array_map(
             fn($category) => $category->id,
             $categories
         );
         $recommandations = [];
-        $fiches          = $this->getFichesByCategories($ids);
+        $fiches = $this->getFichesByCategories($ids);
         foreach ($fiches as $fiche) {
             $idSite = $this->findSiteFiche($fiche);
             if ($fiche->id != $ficheId) {
-                $recommandations[] = [
-                    'title' => $fiche->societe,
-                    'url'   => RouterBottin::getUrlFicheBottin($idSite, $fiche),
-                    'image' => $this->getLogo($fiche->id),
-                ];
+                $tags = [];
+                foreach ($this->getCategoriesOfFiche($fiche->id) as $tag) {
+                    $tags[] = $tag->name;
+                }
+                $recommandations[] = new CommonItem(
+                    $fiche->id,
+                    $fiche->societe,
+                    $fiche->description1,
+                    $this->getLogo($fiche->id),
+                    RouterBottin::getUrlFicheBottin($idSite, $fiche),
+                    $tags
+                );
             }
         }
 
