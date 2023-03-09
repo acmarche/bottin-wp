@@ -369,7 +369,7 @@ class BottinRepository
                 $recommandations[] = new CommonItem(
                     $fiche->id,
                     $fiche->societe,
-                    $fiche->description1,
+                    $fiche->comment1,
                     $this->getLogo($fiche->id),
                     RouterBottin::getUrlFicheBottin($idSite, $fiche),
                     $tags
