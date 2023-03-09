@@ -3,7 +3,6 @@
 
 namespace AcMarche\Bottin\Elasticsearch\Command;
 
-use AcMarche\Bottin\Elasticsearch\Cache;
 use AcMarche\Bottin\Elasticsearch\ElasticServer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -35,8 +34,6 @@ class ElasticServerCommand extends Command
             return Command::SUCCESS;
         }
 
-        define('ABSPATH', dirname(__DIR__).'/../../../../../');
-        Cache::initLoaderWp();
         $elastic = new ElasticServer();
         $elastic->createIndex();
         $elastic->setMapping();
