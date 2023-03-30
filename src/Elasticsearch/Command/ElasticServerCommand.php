@@ -34,6 +34,7 @@ class ElasticServerCommand extends Command
             return Command::SUCCESS;
         }
 
+        define('ABSPATH', dirname(__DIR__).'/../../../../../');
         $elastic = new ElasticServer();
         $elastic->createIndex();
         $elastic->setMapping();
