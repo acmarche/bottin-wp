@@ -290,7 +290,7 @@ class ElasticData
         foreach ($fiches as $fiche) {
 
             $categories = $this->bottinData->getCategoriesFiche($fiche);
-            $categoriesIds = $this->bottinData->getCategoriesFiche($fiche);
+            $categoriesIds = $this->bottinData->getCategoriesFicheGetIds($fiche);
             $idSite     = $this->bottinRepository->findSiteFiche($fiche);
 
             $document          = new DocumentElastic();
