@@ -299,7 +299,7 @@ class ElasticData
             $document->excerpt = Bottin::getExcerpt($fiche);
             $document->content = $this->bottinData->getContentFiche($fiche);
             $document->tags    = $categories;
-            $document->ids    = $categories;
+            $document->ids     = $categoriesIds;
             list($date, $heure) = explode(' ', $fiche->created_at);
             $document->date = $date;
             $document->url  = RouterBottin::getUrlFicheBottin($idSite, $fiche);
