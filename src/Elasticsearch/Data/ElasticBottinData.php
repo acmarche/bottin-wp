@@ -66,7 +66,7 @@ class ElasticBottinData
         $data       = $this->bottinRepository->getCategoriesOfFiche($fiche->id);
         $categories = [];
         foreach ($data as $category) {
-            $categories[] = $category->name;
+            $categories[$category->id] = $category->name;
         }
 
         return $categories;

@@ -19,13 +19,14 @@ class ElasticIndexer
     private SerializerInterface $serializer;
     private ElasticData $elasticData;
     private SymfonyStyle|null $outPut;
+    private array $skips = [705];
 
     public function __construct(?SymfonyStyle $outPut = null)
     {
         $this->connect();
-        $this->serializer  = (new AcSerializer())->create();
+        $this->serializer = (new AcSerializer())->create();
         $this->elasticData = new ElasticData();
-        $this->outPut      = $outPut;
+        $this->outPut = $outPut;
     }
 
     public function indexAllPosts(array $sites = array())
@@ -84,8 +85,8 @@ class ElasticIndexer
     public function addPost(DocumentElastic $documentElastic, int $blogId): Response
     {
         $content = $this->serializer->serialize($documentElastic, 'json');
-        $id      = $this->createIdPost($documentElastic->id, $blogId);
-        $doc     = new Document($id, $content);
+        $id = $this->createIdPost($documentElastic->id, $blogId);
+        $doc = new Document($id, $content);
 
         return $this->index->addDocument($doc);
     }
@@ -124,9 +125,9 @@ class ElasticIndexer
 
     private function addCategory(DocumentElastic $documentElastic, int $blodId)
     {
-        $content  = $this->serializer->serialize($documentElastic, 'json');
-        $id       = 'category_'.$blodId.'_'.$documentElastic->id;
-        $doc      = new Document($id, $content);
+        $content = $this->serializer->serialize($documentElastic, 'json');
+        $id = 'category_'.$blodId.'_'.$documentElastic->id;
+        $doc = new Document($id, $content);
         $response = $this->index->addDocument($doc);
         if ($response->hasError()) {
             if ($this->outPut) {
@@ -145,9 +146,12 @@ class ElasticIndexer
     {
         $categories = $this->elasticData->getAllCategoriesBottin($this->outPut);
         foreach ($categories as $documentElastic) {
-            $content  = $this->serializer->serialize($documentElastic, 'json');
-            $id       = 'bottin_cat_'.$documentElastic->id;
-            $doc      = new Document($id, $content);
+            if (in_array($documentElastic->id, $this->skips)) {
+                continue;
+            }
+            $content = $this->serializer->serialize($documentElastic, 'json');
+            $id = 'bottin_cat_'.$documentElastic->id;
+            $doc = new Document($id, $content);
             $response = $this->index->addDocument($doc);
             if ($this->outPut) {
                 $this->outPut->writeln("Bottin cat: ".$documentElastic->name.' '.$documentElastic->count.'fiches');
@@ -162,9 +166,18 @@ class ElasticIndexer
     {
         $fiches = $this->elasticData->getAllfiches();
         foreach ($fiches as $documentElastic) {
+            $skip = false;
+            foreach ($documentElastic->tags as $categoryId => $categoryName) {
+                if (in_array($categoryId, $this->skips)) {
+                    $skip = true;
+                }
+            }
+            if ($skip) {
+                continue;
+            }
             $content = $this->serializer->serialize($documentElastic, 'json');
-            $id      = 'fiche_'.$documentElastic->id;
-            $doc     = new Document($id, $content);
+            $id = 'fiche_'.$documentElastic->id;
+            $doc = new Document($id, $content);
             $this->index->addDocument($doc);
             if ($this->outPut) {
                 $this->outPut->writeln($documentElastic->name);
@@ -177,8 +190,8 @@ class ElasticIndexer
         switch_to_blog(Theme::ADMINISTRATION);
         foreach ($this->elasticData->getEnquetesDocumentElastic() as $documentElastic) {
             $content = $this->serializer->serialize($documentElastic, 'json');
-            $id      = 'enquete_'.$documentElastic->id;
-            $doc     = new Document($id, $content);
+            $id = 'enquete_'.$documentElastic->id;
+            $doc = new Document($id, $content);
             $this->index->addDocument($doc);
             if ($this->outPut) {
                 $this->outPut->writeln($documentElastic->name);
