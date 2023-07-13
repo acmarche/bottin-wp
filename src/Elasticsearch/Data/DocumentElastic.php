@@ -14,4 +14,5 @@ class DocumentElastic
     public string $date;
     public string $url;
     public int $count;
+    public array $ids=[];
 }

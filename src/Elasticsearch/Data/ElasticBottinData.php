@@ -66,7 +66,23 @@ class ElasticBottinData
         $data       = $this->bottinRepository->getCategoriesOfFiche($fiche->id);
         $categories = [];
         foreach ($data as $category) {
-            $categories[$category->id] = $category->name;
+            $categories[] = $category->name;
+        }
+
+        return $categories;
+    }
+
+    /**
+     * @param $fiche
+     *
+     * @return string[]
+     */
+    public function getCategoriesFicheGetIds($fiche): array
+    {
+        $data       = $this->bottinRepository->getCategoriesOfFiche($fiche->id);
+        $categories = [];
+        foreach ($data as $category) {
+            $categories[] = $category->id;
         }
 
         return $categories;

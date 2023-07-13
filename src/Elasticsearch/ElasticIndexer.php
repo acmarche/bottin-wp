@@ -167,7 +167,7 @@ class ElasticIndexer
         $fiches = $this->elasticData->getAllfiches();
         foreach ($fiches as $documentElastic) {
             $skip = false;
-            foreach ($documentElastic->tags as $categoryId => $categoryName) {
+            foreach ($documentElastic->ids as $categoryId ) {
                 if (in_array($categoryId, $this->skips)) {
                     $skip = true;
                 }
