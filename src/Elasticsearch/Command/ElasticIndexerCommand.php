@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class ElasticIndexerCommand extends Command
 {
-    private  SymfonyStyle$io;
+    private SymfonyStyle $io;
 
     protected function configure()
     {
@@ -30,9 +30,9 @@ class ElasticIndexerCommand extends Command
     {
         define('ABSPATH', dirname(__DIR__).'/../../../../../');
         Cache::initLoaderWp();
-        $action   = $input->getArgument('action');
+        $action = $input->getArgument('action');
         $this->io = new SymfonyStyle($input, $output);
-        $elastic  = new ElasticIndexer($this->io);
+        $elastic = new ElasticIndexer($this->io);
 
         switch ($action) {
             case 'posts':
@@ -51,6 +51,10 @@ class ElasticIndexerCommand extends Command
             case 'enquetes':
                 $this->io->section("ENQUETES");
                 $elastic->indexEnquetes();
+                break;
+            case 'adl':
+                $this->io->section("ADL");
+                $elastic->indexAdl();
                 break;
             case 'all':
                 $this->io->section("POSTS");

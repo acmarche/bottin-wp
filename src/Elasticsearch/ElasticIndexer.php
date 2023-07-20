@@ -2,6 +2,7 @@
 
 namespace AcMarche\Bottin\Elasticsearch;
 
+use AcMarche\Bottin\Elasticsearch\Adl\AdlIndexer;
 use AcMarche\Bottin\Elasticsearch\Data\DocumentElastic;
 use AcMarche\Bottin\Elasticsearch\Data\ElasticData;
 use AcMarche\MarcheTail\Inc\Theme;
@@ -19,7 +20,7 @@ class ElasticIndexer
     private SerializerInterface $serializer;
     private ElasticData $elasticData;
     private SymfonyStyle|null $outPut;
-    private array $skips = [705];
+    private array $skips = [705, 707];
 
     public function __construct(?SymfonyStyle $outPut = null)
     {
@@ -167,7 +168,7 @@ class ElasticIndexer
         $fiches = $this->elasticData->getAllfiches();
         foreach ($fiches as $documentElastic) {
             $skip = false;
-            foreach ($documentElastic->ids as $categoryId ) {
+            foreach ($documentElastic->ids as $categoryId) {
                 if (in_array($categoryId, $this->skips)) {
                     $skip = true;
                 }
@@ -195,6 +196,36 @@ class ElasticIndexer
             $this->index->addDocument($doc);
             if ($this->outPut) {
                 $this->outPut->writeln($documentElastic->name);
+            }
+        }
+    }
+
+    public function indexAdl()
+    {
+        $adlIndexer = new AdlIndexer();
+        foreach ($adlIndexer->getAllCategories() as $documentElastic) {
+            $content = $this->serializer->serialize($documentElastic, 'json');
+            $id = 'adl_cat_'.$documentElastic->id;
+            $doc = new Document($id, $content);
+            $response = $this->index->addDocument($doc);
+            if ($this->outPut) {
+                $this->outPut->writeln("Bottin cat: ".$documentElastic->name.' '.$documentElastic->count.'fiches');
+                if ($response->hasError()) {
+                    $this->outPut->writeln('Erreur lors de l\'indexation: '.$response->getErrorMessage());
+                }
+            }
+        }
+
+        foreach ($adlIndexer->getAllPosts() as $documentElastic) {
+            foreach ($documentElastic->ids as $categoryId) {
+                $content = $this->serializer->serialize($documentElastic, 'json');
+                $id = 'fiche_'.$documentElastic->id;
+                $doc = new Document($id, $content);
+                $this->index->addDocument($doc);
+                if ($this->outPut) {
+                    $this->outPut->writeln($documentElastic->name);
+                }
+
             }
         }
     }
