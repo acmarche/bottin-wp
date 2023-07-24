@@ -23,7 +23,7 @@ class AdlClient
     public function getAllPosts(): array
     {
         $this->connect($this->baseUrl);
-        $dataString = $this->executeRequest($this->baseUrl.'/posts');
+        $dataString = $this->executeRequest($this->baseUrl.'/posts/?per_page=100');
 
         return json_decode($dataString);
     }
