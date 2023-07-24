@@ -209,7 +209,7 @@ class ElasticIndexer
             $doc = new Document($id, $content);
             $response = $this->index->addDocument($doc);
             if ($this->outPut) {
-                $this->outPut->writeln("Bottin cat: ".$documentElastic->name.' '.$documentElastic->count.'fiches');
+                $this->outPut->writeln("Adl cat: ".$documentElastic->name);
                 if ($response->hasError()) {
                     $this->outPut->writeln('Erreur lors de l\'indexation: '.$response->getErrorMessage());
                 }
@@ -217,15 +217,12 @@ class ElasticIndexer
         }
 
         foreach ($adlIndexer->getAllPosts() as $documentElastic) {
-            foreach ($documentElastic->ids as $categoryId) {
-                $content = $this->serializer->serialize($documentElastic, 'json');
-                $id = 'fiche_'.$documentElastic->id;
-                $doc = new Document($id, $content);
-                $this->index->addDocument($doc);
-                if ($this->outPut) {
-                    $this->outPut->writeln($documentElastic->name);
-                }
-
+            $content = $this->serializer->serialize($documentElastic, 'json');
+            $id = 'adl_'.$documentElastic->id;
+            $doc = new Document($id, $content);
+            $this->index->addDocument($doc);
+            if ($this->outPut) {
+                $this->outPut->writeln($documentElastic->name);
             }
         }
     }

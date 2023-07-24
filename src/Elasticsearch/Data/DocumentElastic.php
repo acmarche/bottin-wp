@@ -13,6 +13,6 @@ class DocumentElastic
     public array $tags=[];
     public string $date;
     public string $url;
-    public int $count;
+    public int $count = 0;
     public array $ids=[];
 }
