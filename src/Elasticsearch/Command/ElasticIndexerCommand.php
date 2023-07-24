@@ -66,6 +66,8 @@ class ElasticIndexerCommand extends Command
                 $elastic->indexAllBottin();
                 $this->io->section("ENQUETES");
                 $elastic->indexEnquetes();
+                $this->io->section("ADL");
+                $elastic->indexAdl();
         }
 
         return Command::SUCCESS;
