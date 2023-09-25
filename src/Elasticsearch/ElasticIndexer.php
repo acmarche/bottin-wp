@@ -20,7 +20,7 @@ class ElasticIndexer
     private SerializerInterface $serializer;
     private ElasticData $elasticData;
     private SymfonyStyle|null $outPut;
-    private array $skips = [705, 707];
+    private array $skips = [679, 705, 707];
 
     public function __construct(?SymfonyStyle $outPut = null)
     {
