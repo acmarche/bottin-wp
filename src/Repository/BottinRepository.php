@@ -13,19 +13,20 @@ use PDO;
 
 class BottinRepository
 {
-    private \PDO $dbh;
+    private ?\PDO $dbh = null;
 
-    public function __construct()
+    private function init()
     {
-        Env::loadEnv();
-        $dsn = 'mysql:host=localhost;dbname=bottin';
-        $username = $_ENV['DB_BOTTIN_USER'];
-        $password = $_ENV['DB_BOTTIN_PASS'];
-        $options = array(
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-        );
-
-        $this->dbh = new PDO($dsn, $username, $password, $options);
+        if (!$this->dbh) {
+            Env::loadEnv();
+            $dsn = 'mysql:host=localhost;dbname=bottin';
+            $username = $_ENV['DB_BOTTIN_USER'];
+            $password = $_ENV['DB_BOTTIN_PASS'];
+            $options = array(
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+            );
+            $this->dbh = new PDO($dsn, $username, $password, $options);
+        }
     }
 
     public function getClassementsFiche(int $ficheId): array|bool
@@ -117,6 +118,7 @@ class BottinRepository
      */
     public function getFicheBySlug(string $slug): ?object
     {
+        $this->init();
         $sql = 'SELECT * FROM fiche WHERE `slug` = :slug ';
         $sth = $this->dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute(array(':slug' => $slug));
@@ -215,18 +217,6 @@ class BottinRepository
         return $data;
     }
 
-    public function getParentxxx(int $parentId): ?object
-    {
-        $id = null;
-        $sql = 'SELECT * FROM category WHERE `parent_id` = '.$id;
-        $sth = $this->execQuery($sql);
-        if (!$data = $sth->fetch(PDO::FETCH_OBJ)) {
-            return null;
-        }
-
-        return $data;
-    }
-
     /**
      *
      * @return object|bool
@@ -234,6 +224,7 @@ class BottinRepository
      */
     public function getCategoryBySlug(string $slug): ?object
     {
+        $this->init();
         $sql = 'SELECT * FROM category WHERE `slug` = :slug ';
         $sth = $this->dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $sth->execute(array(':slug' => $slug));
@@ -262,7 +253,6 @@ class BottinRepository
     }
 
     /**
-     * @param int $id
      *
      * @throws Exception
      */
@@ -310,30 +300,6 @@ class BottinRepository
         return $this->sort($data);
     }
 
-    public function getTreeCategories(): array
-    {
-        $categories = [];
-        $roots = $this->getCategories(null);
-        foreach ($roots as $root) {
-            $categories[$root->id][0] = $root;
-            $levels1 = $this->getCategories($root->id);
-            $categories[$root->id][1] = $levels1;
-
-            foreach ($levels1 as $level) {
-                $categories[$root->id][0] = $level;
-                $level2 = $this->getCategories($level->id);
-                $categories[$root->id][1][2] = $level2;
-            }
-        }
-
-        return $categories;
-    }
-
-    public function getTree(): void
-    {
-
-    }
-
     /**
      * @param $sql
      *
@@ -341,6 +307,7 @@ class BottinRepository
      */
     public function execQuery($sql): \PDOStatement|false
     {
+        $this->init();
         $query = $this->dbh->query($sql);
         $error = $this->dbh->errorInfo();
         if ($error[0] != '0000') {

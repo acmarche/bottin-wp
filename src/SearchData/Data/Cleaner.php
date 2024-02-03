@@ -1,7 +1,7 @@
 <?php
 
 
-namespace AcMarche\Bottin\Elasticsearch\Data;
+namespace AcMarche\Bottin\SearchData\Data;
 
 class Cleaner
 {

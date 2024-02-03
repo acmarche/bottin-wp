@@ -1,6 +1,6 @@
 <?php
 
-namespace AcMarche\Bottin\Elasticsearch\Data;
+namespace AcMarche\Bottin\SearchData\Data;
 
 use AcMarche\Bottin\Bottin;
 use AcMarche\Bottin\Mailer;
@@ -23,8 +23,8 @@ class ElasticData
     public function __construct()
     {
         $this->bottinRepository = new BottinRepository();
-        $this->wpRepository     = new WpRepository();
-        $this->bottinData       = new ElasticBottinData();
+        $this->wpRepository = new WpRepository();
+        $this->bottinData = new ElasticBottinData();
     }
 
     /**
@@ -32,26 +32,26 @@ class ElasticData
      *
      * @return DocumentElastic[]
      */
-    public function getCategoriesBySite(): array
+    public function getCategoriesBySite(int $siteId): array
     {
         $args = array(
-            'type'         => 'post',
-            'child_of'     => 0,
-            'parent'       => '',
-            'orderby'      => 'name',
-            'order'        => 'ASC',
-            'hide_empty'   => 0,
+            'type' => 'post',
+            'child_of' => 0,
+            'parent' => '',
+            'orderby' => 'name',
+            'order' => 'ASC',
+            'hide_empty' => 0,
             'hierarchical' => 1,
-            'exclude'      => '',
-            'include'      => '',
-            'number'       => '',
-            'taxonomy'     => 'category',
-            'pad_counts'   => true,
+            'exclude' => '',
+            'include' => '',
+            'number' => '',
+            'taxonomy' => 'category',
+            'pad_counts' => true,
         );
 
         $categories = get_categories($args);
-        $datas      = [];
-        $today      = new \DateTime();
+        $datas = [];
+        $today = new \DateTime();
 
         foreach ($categories as $category) {
 
@@ -60,10 +60,10 @@ class ElasticData
                 $description = Cleaner::cleandata($category->description);
             }
 
-            $date    = $today->format('Y-m-d');
+            $date = $today->format('Y-m-d');
             $content = $description;
 
-            foreach ($this->getPosts($category->cat_ID) as $documentElastic) {
+            foreach ($this->getPosts($category->cat_ID, $siteId) as $documentElastic) {
                 $content .= $documentElastic->name;
                 $content .= $documentElastic->excerpt;
                 $content .= $documentElastic->content;
@@ -73,7 +73,7 @@ class ElasticData
             $content .= $this->getContentEnquetes($category->cat_ID);
 
             $children = $this->wpRepository->getChildrenOfCategory($category->cat_ID);
-            $tags     = [];
+            $tags = [];
             foreach ($children as $child) {
                 $tags[] = $child->name;
             }
@@ -82,14 +82,14 @@ class ElasticData
                 $tags[] = $parent->name;
             }
 
-            $document          = new DocumentElastic();
-            $document->id      = $category->cat_ID;
-            $document->name    = Cleaner::cleandata($category->name);
+            $document = new DocumentElastic();
+            $document->id = $category->cat_ID;
+            $document->name = Cleaner::cleandata($category->name);
             $document->excerpt = $description;
             $document->content = $content;
-            $document->tags    = $tags;
-            $document->date    = $date;
-            $document->url     = get_category_link($category->cat_ID);
+            $document->tags = $tags;
+            $document->date = $date;
+            $document->url = get_category_link($category->cat_ID);
 
             $datas[] = $document;
         }
@@ -108,7 +108,7 @@ class ElasticData
                   }*/
                 foreach (WpRepository::getEnquetesPubliques($categoryId) as $permis) {
                     $document = $this->createDocumentElasticFromEnquete($permis);
-                    $content  .= $document->name.' '.$document->excerpt.' '.$document->content;
+                    $content .= $document->name.' '.$document->excerpt.' '.$document->content;
                 }
             }
         }
@@ -141,14 +141,14 @@ class ElasticData
 
         $content = $categorieEnqueteNom.' '.$enquete->intitule.' '.$enquete->demandeur.' à '.$enquete->localite.' '.$enquete->description;
 
-        $document          = new DocumentElastic();
-        $document->id      = $enquete->id;
-        $document->name    = $enquete->intitule;
+        $document = new DocumentElastic();
+        $document->id = $enquete->id;
+        $document->name = $enquete->intitule;
         $document->excerpt = $enquete->demandeur.' à '.$enquete->localite;
         $document->content = $content;
-        $document->tags    = [];//todo
-        $document->date    = $enquete->date_debut;
-        $document->url     = RouterMarche::getUrlEnquete($enquete->id);
+        $document->tags = [];//todo
+        $document->date = $enquete->date_debut;
+        $document->url = RouterMarche::getUrlEnquete($enquete->id);
 
         return $document;
     }
@@ -158,12 +158,12 @@ class ElasticData
      *
      * @return DocumentElastic[]
      */
-    public function getPosts(int $categoryId = null): array
+    public function getPosts(int $categoryId = null, int $siteId): array
     {
         $args = array(
             'numberposts' => 5000,
-            'orderby'     => 'post_title',
-            'order'       => 'ASC',
+            'orderby' => 'post_title',
+            'order' => 'ASC',
             'post_status' => 'publish',
         );
 
@@ -175,7 +175,7 @@ class ElasticData
         $datas = [];
 
         foreach ($posts as $post) {
-            if ($document = $this->postToDocumentElastic($post)) {
+            if ($document = $this->postToDocumentElastic($post, $siteId)) {
                 $datas[] = $document;
             } else {
                 Mailer::sendError(
@@ -189,10 +189,10 @@ class ElasticData
         return $datas;
     }
 
-    public function postToDocumentElastic(WP_Post $post): ?DocumentElastic
+    public function postToDocumentElastic(WP_Post $post, int $siteId): ?DocumentElastic
     {
         try {
-            return $this->createDocumentElastic($post);
+            return $this->createDocumentElastic($post, $siteId);
         } catch (\Exception $exception) {
             Mailer::sendError("update elastic", "create document ".$post->post_title.' => '.$exception->getMessage());
         }
@@ -207,43 +207,43 @@ class ElasticData
     {
         switch_to_blog(Theme::ADMINISTRATION);
 
-        return $this->getPages();
+        return $this->getPages(Theme::ADMINISTRATION);
     }
 
     /**
      * @return DocumentElastic[]
      */
-    private function getPages(): array
+    private function getPages(int $siteId): array
     {
-        $args  = array(
-            'sort_order'   => 'asc',
-            'sort_column'  => 'post_title',
+        $args = array(
+            'sort_order' => 'asc',
+            'sort_column' => 'post_title',
             'hierarchical' => 1,
-            'exclude'      => '',
-            'include'      => '',
-            'meta_key'     => '',
-            'meta_value'   => '',
-            'authors'      => '',
-            'child_of'     => 0,
-            'parent'       => -1,
+            'exclude' => '',
+            'include' => '',
+            'meta_key' => '',
+            'meta_value' => '',
+            'authors' => '',
+            'child_of' => 0,
+            'parent' => -1,
             'exclude_tree' => '',
-            'number'       => '',
-            'offset'       => 0,
-            'post_type'    => 'page',
-            'post_status'  => 'publish',
+            'number' => '',
+            'offset' => 0,
+            'post_type' => 'page',
+            'post_status' => 'publish',
         );
         $pages = get_pages($args);
 
         $datas = [];
 
         foreach ($pages as $post) {
-            $datas[] = $this->createDocumentElastic($post);
+            $datas[] = $this->createDocumentElastic($post, $siteId);
         }
 
         return $datas;
     }
 
-    private function createDocumentElastic(WP_Post $post): DocumentElastic
+    private function createDocumentElastic(WP_Post $post, int $siteId): DocumentElastic
     {
         list($date, $time) = explode(" ", $post->post_date);
         $categories = array();
@@ -254,14 +254,14 @@ class ElasticData
         $content = get_the_content(null, null, $post);
         $content = apply_filters('the_content', $content);
 
-        $document          = new DocumentElastic();
-        $document->id      = $post->ID;
-        $document->name    = Cleaner::cleandata($post->post_title);
+        $document = new DocumentElastic();
+        $document->id = $this->createId($post->ID, "post", $siteId);
+        $document->name = Cleaner::cleandata($post->post_title);
         $document->excerpt = Cleaner::cleandata($post->post_excerpt);
         $document->content = Cleaner::cleandata($content);
-        $document->tags    = $categories;
-        $document->date    = $date;
-        $document->url     = get_permalink($post->ID);
+        $document->tags = $categories;
+        $document->date = $date;
+        $document->url = get_permalink($post->ID);
 
         return $document;
     }
@@ -285,25 +285,25 @@ class ElasticData
      */
     public function getAllfiches(): array
     {
-        $fiches    = $this->bottinRepository->getFiches();
+        $fiches = $this->bottinRepository->getFiches();
         $documents = [];
         foreach ($fiches as $fiche) {
 
             $categories = $this->bottinData->getCategoriesFiche($fiche);
             $categoriesIds = $this->bottinData->getCategoriesFicheGetIds($fiche);
-            $idSite     = $this->bottinRepository->findSiteFiche($fiche);
+            $idSite = $this->bottinRepository->findSiteFiche($fiche);
 
-            $document          = new DocumentElastic();
-            $document->id      = $fiche->id;
-            $document->name    = $fiche->societe;
+            $document = new DocumentElastic();
+            $document->id = $fiche->id;
+            $document->name = $fiche->societe;
             $document->excerpt = Bottin::getExcerpt($fiche);
             $document->content = $this->bottinData->getContentFiche($fiche);
-            $document->tags    = $categories;
-            $document->ids     = $categoriesIds;
+            $document->tags = $categories;
+            $document->ids = $categoriesIds;
             list($date, $heure) = explode(' ', $fiche->created_at);
             $document->date = $date;
-            $document->url  = RouterBottin::getUrlFicheBottin($idSite, $fiche);
-            $documents[]    = $document;
+            $document->url = RouterBottin::getUrlFicheBottin($idSite, $fiche);
+            $documents[] = $document;
         }
 
         return $documents;
@@ -316,21 +316,21 @@ class ElasticData
      */
     public function getAllCategoriesBottin(?SymfonyStyle $outPut = null): array
     {
-        $data       = $this->bottinRepository->getAllCategories();
+        $data = $this->bottinRepository->getAllCategories();
         $categories = [];
         foreach ($data as $category) {
-            $created           = explode(' ', $category->created_at);
-            $document          = new DocumentElastic();
-            $document->id      = $category->id;
-            $document->name    = $category->name;
+            $created = explode(' ', $category->created_at);
+            $document = new DocumentElastic();
+            $document->id = $category->id;
+            $document->name = $category->name;
             $document->excerpt = $category->description;
-            $document->tags    = [];//todo
-            $document->date    = $created[0];
-            $document->url     = RouterBottin::getUrlCategoryBottin($category);
-            $fiches            = $this->bottinRepository->getFichesByCategory($category->id);
-            $document->count   = count($fiches);
+            $document->tags = [];//todo
+            $document->date = $created[0];
+            $document->url = RouterBottin::getUrlCategoryBottin($category);
+            $fiches = $this->bottinRepository->getFichesByCategory($category->id);
+            $document->count = count($fiches);
             $document->content = $this->bottinData->getContentForCategory($fiches);
-            $categories[]      = $document;
+            $categories[] = $document;
         }
 
         return $categories;
@@ -344,17 +344,27 @@ class ElasticData
         }
 
         $demandeur = $permis->demandeurs[0];
-        $content   = $categorieEnqueteNom.' '.$permis->intitule.' '.$permis->demandeur.' à '.$permis->localite.' '.$permis->description;
+        $content = $categorieEnqueteNom.' '.$permis->intitule.' '.$permis->demandeur.' à '.$permis->localite.' '.$permis->description;
 
-        $document          = new DocumentElastic();
-        $document->id      = $permis->id;
-        $document->name    = $permis->urbain;
+        $document = new DocumentElastic();
+        $document->id = $permis->id;
+        $document->name = $permis->urbain;
         $document->excerpt = $permis->demandeur.' à '.$permis->localite;
         $document->content = $content;
-        $document->tags    = [];//todo
-        $document->date    = $permis->date_debut;
-        $document->url     = RouterMarche::getUrlEnquete($permis->id);
+        $document->tags = [];//todo
+        $document->date = $permis->date_debut;
+        $document->url = RouterMarche::getUrlEnquete($permis->id);
 
         return $document;
+    }
+
+    public function createId(int $id, string $type, ?int $siteId = 0): string
+    {
+        $id = $type.'-'.$id;
+        if ($siteId) {
+            $id .= '-'.$siteId;
+        }
+
+        return $id;
     }
 }

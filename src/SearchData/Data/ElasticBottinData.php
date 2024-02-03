@@ -1,11 +1,13 @@
 <?php
 
-namespace AcMarche\Bottin\Elasticsearch\Data;
+namespace AcMarche\Bottin\SearchData\Data;
 
 use AcMarche\Bottin\Repository\BottinRepository;
 
 class ElasticBottinData
 {
+    private BottinRepository $bottinRepository;
+
     public function __construct()
     {
         $this->bottinRepository = new BottinRepository();

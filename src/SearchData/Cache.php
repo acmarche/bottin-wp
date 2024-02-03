@@ -1,6 +1,6 @@
 <?php
 
-namespace AcMarche\Bottin\Elasticsearch;
+namespace AcMarche\Bottin\SearchData;
 
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -78,20 +78,5 @@ class Cache
     public static function generateCodeCategory(int $blogId, int $categoryId): string
     {
         return 'category-'.$blogId.'-'.$categoryId;
-    }
-
-    public static function initLoaderWp()
-    {
-        if ( ! defined('ABSPATH')) {
-            define('ABSPATH', dirname(__DIR__).'/../../');
-            if ( ! defined('ABSPATH')) {
-                define('ABSPATH', dirname(__DIR__).'/../../');
-            }
-            if ( ! defined('WP_USE_THEMES')) {
-                define('WP_USE_THEMES', false);
-            }
-        }
-        $_SERVER['HTTP_HOST'] = 'www.marche.be';
-        require_once ABSPATH.'wp-load.php';
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace AcMarche\Bottin\Elasticsearch\Adl;
+namespace AcMarche\Bottin\SearchData\Adl;
 
-use AcMarche\Bottin\Elasticsearch\Data\Cleaner;
-use AcMarche\Bottin\Elasticsearch\Data\DocumentElastic;
+use AcMarche\Bottin\SearchData\Data\Cleaner;
+use AcMarche\Bottin\SearchData\Data\DocumentElastic;
 use AcMarche\Common\Env;
 
 class AdlIndexer

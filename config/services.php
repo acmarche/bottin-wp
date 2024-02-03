@@ -1,5 +1,6 @@
 <?php
 
+use AcMarche\Bottin\Search\SearchMeili;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -19,5 +20,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     #this creates a service per class whose id is the fully-qualified class name
     $services->load('AcMarche\Bottin\\', __DIR__.'/../src/*')
              ->exclude([__DIR__.'/../src/{Entities,Tests}']);
+
+    if (class_exists(SearchMeili::class)) {
+        $services->set('searchMeiliBottin', SearchMeili::class)
+            ->public();
+    }
 
 };

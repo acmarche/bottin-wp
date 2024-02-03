@@ -1,6 +1,6 @@
 <?php
 
-namespace AcMarche\Bottin\Elasticsearch\Http;
+namespace AcMarche\Bottin\SearchData\Adl;
 
 use Exception;
 use Symfony\Component\HttpClient\Exception\ClientException;

@@ -1,8 +1,6 @@
 <?php
 
-namespace AcMarche\Bottin\Elasticsearch\Adl;
-
-use AcMarche\Bottin\Elasticsearch\Http\ConnectionTrait;
+namespace AcMarche\Bottin\SearchData\Adl;
 
 class AdlClient
 {
