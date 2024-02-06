@@ -17,7 +17,7 @@ class MeiliServer
     private ElasticData $elasticData;
     private array $skips = [679, 705, 707];
     private string $primaryKey = 'id';
-    private Indexes $index;
+    private ?Indexes $index = null;
 
     public function __construct(
         #[Autowire(env: 'MEILI_INDEX_NAME')]
@@ -63,7 +63,6 @@ class MeiliServer
     public function addContent()
     {
         $this->init();
-        $this->index = $this->client->index($this->indexName);
 
         $this->indexAllPosts();
         $this->indexAllCategories();
