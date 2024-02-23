@@ -26,13 +26,12 @@ class SearchMeili
     public function doSearch(string $keyword, string $localite = null): iterable|SearchResult
     {
         $this->init();
-        $index = $this->client->index($this->indexName);
         $filters = ['filter' => ['type = fiche']];
         if ($localite) {
             $filters['filter'] = ['localite = '.$localite];
         }
 
-        return $index->search($keyword, []);
+        return $this->index->search($keyword, []);
     }
 
 }
