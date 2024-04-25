@@ -64,8 +64,8 @@ class MeiliServerCommand extends Command
 
         if ($update) {
             $_SERVER['HTTP_HOST'] = 'HTTP_HOST';//force
-            require_once __DIR__.'/../../../../../wp-load.php';
             try {
+                require_once 'wp-load.php';
                 $this->meiliServer->addContent();
             } catch (\Exception|TransportExceptionInterface $e) {
                 $this->io->error($e->getMessage());
