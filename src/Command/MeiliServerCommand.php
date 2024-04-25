@@ -63,6 +63,7 @@ class MeiliServerCommand extends Command
         }
 
         if ($update) {
+            dump(__DIR__);
             $_SERVER['HTTP_HOST'] = 'HTTP_HOST';//force
             try {
                 require_once 'wp-load.php';
