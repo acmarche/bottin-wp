@@ -63,8 +63,7 @@ class MeiliServerCommand extends Command
         }
 
         if ($update) {
-            dump(__DIR__.'/../../../../../wp-load.php');
-            $_SERVER['HTTP_HOST'] = 'HTTP_HOST';//force
+            $_SERVER['HTTP_HOST'] = 'www.marche.be';//force
             try {
                 require_once __DIR__.'/../../../../../wp-load.php';
                 $this->meiliServer->addContent();
