@@ -26,11 +26,6 @@ class SearchMeili
     public function doSearch(string $keyword, string $localite = null): iterable|SearchResult
     {
         $this->init();
-        $filters = ['filter' => ['type = fiche']];
-        if ($localite) {
-            $filters['filter'] = ['localite = '.$localite];
-        }
-
         return $this->index->search($keyword, []);
     }
 
