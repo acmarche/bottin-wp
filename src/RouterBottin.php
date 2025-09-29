@@ -29,7 +29,7 @@ class RouterBottin
     public static function getBaseUrlSite(?int $blodId = null): string
     {
         if (is_multisite()) {
-            if ( ! $blodId) {
+            if (!$blodId) {
                 $blodId = Theme::CITOYEN;
             }
 
@@ -71,7 +71,7 @@ class RouterBottin
             return self::generateCategoryUrlCap($category, new BottinRepository());
         }
 
-        return self::getBaseUrlSite(Theme::ECONOMIE).self::BOTTIN_CATEGORY_URL.'/'.$category->slug;
+        return self::getBaseUrlSite(Theme::ECONOMIE) . self::BOTTIN_CATEGORY_URL . '/' . $category->slug;
     }
 
     public static function getUrlFicheBottin(int $blogId, stdClass $fiche): string
@@ -80,7 +80,7 @@ class RouterBottin
             return $url;
         }
 
-        return self::getBaseUrlSite($blogId).self::BOTTIN_FICHE_URL.$fiche->slug;
+        return self::getBaseUrlSite($blogId) . self::BOTTIN_FICHE_URL . $fiche->slug;
     }
 
     public function addRouteBottin(): void
@@ -89,8 +89,8 @@ class RouterBottin
             'init',
             function () {
                 add_rewrite_rule(
-                    self::BOTTIN_FICHE_URL.'([a-zA-Z0-9-]+)[/]?$',
-                    'index.php?'.self::PARAM_BOTTIN_FICHE.'=$matches[1]',
+                    self::BOTTIN_FICHE_URL . '([a-zA-Z0-9-]+)[/]?$',
+                    'index.php?' . self::PARAM_BOTTIN_FICHE . '=$matches[1]',
                     'top'
                 );
             }
@@ -107,7 +107,7 @@ class RouterBottin
             'template_include',
             function ($template) {
                 global $wp_query;
-                if (is_admin() || ! $wp_query->is_main_query()) {
+                if (is_admin() || !$wp_query->is_main_query()) {
                     return $template;
                 }
 
@@ -116,7 +116,7 @@ class RouterBottin
                     return $template;
                 }
 
-                return get_template_directory().'/single-bottin_fiche.php';
+                return get_template_directory() . '/single-bottin_fiche.php';
             }
         );
     }
@@ -127,8 +127,8 @@ class RouterBottin
             'init',
             function () {
                 add_rewrite_rule(
-                    self::BOTTIN_CATEGORY_URL.'/([a-zA-Z0-9-]+)[/]?$',
-                    'index.php?'.self::PARAM_BOTTIN_CATEGORY.'=$matches[1]',
+                    self::BOTTIN_CATEGORY_URL . '/([a-zA-Z0-9-]+)[/]?$',
+                    'index.php?' . self::PARAM_BOTTIN_CATEGORY . '=$matches[1]',
                     'top'
                 );
             }
@@ -145,7 +145,7 @@ class RouterBottin
             'template_include',
             function ($template) {
                 global $wp_query;
-                if (is_admin() || ! $wp_query->is_main_query()) {
+                if (is_admin() || !$wp_query->is_main_query()) {
                     return $template;
                 }
 
@@ -154,7 +154,7 @@ class RouterBottin
                     return $template;
                 }
 
-                return get_template_directory().'/category_bottin.php';
+                return get_template_directory() . '/category_bottin.php';
             }
         );
     }
@@ -164,18 +164,7 @@ class RouterBottin
      */
     public static function generateFicheUrlCap(stdClass $fiche): ?string
     {
-        $urlBase = 'https://cap.marche.be/commerces-et-entreprises/';
-        $bottinRepository = new BottinRepository();
-        $categories = $bottinRepository->getCategoriesOfFiche($fiche->id);
-        $idSite = $bottinRepository->findSiteFiche($fiche);
-        //  $classementPrincipal = $bottinRepository->getCategoriePrincipale($fiche);
-        if (($category = self::isEconomie($categories, $bottinRepository)) === null) {
-            return null;
-        }
-
-        $secteur = $category->slug;
-
-        return $urlBase.$secteur.'/'.$fiche->slug;
+        return 'https://cap.marche.be/en_GB/commerce?id=' . $fiche->id;
     }
 
     /**
@@ -183,9 +172,18 @@ class RouterBottin
      */
     public static function generateCategoryUrlCap(stdClass $category, BottinRepository $bottinRepository): string
     {
-        $parent = $bottinRepository->getCategory($category->parent_id);
+        $parents = [574, 520, 609, 548, 582, 553, 527, 540, 534, 636, 568, 591];
 
-        return 'https://cap.marche.be/secteur/'.$parent->slug.'/'.$category->slug;
+        if (in_array($category->id, $parents)) {
+            $categoryId = $category->id;
+            $sousCategory = '';
+        } else {
+            $parent = $bottinRepository->getCategory($category->parent_id);
+            $categoryId = $parent->id;
+            $sousCategory = $category->id;
+        }
+
+        return "https://cap.marche.be/en_GB/liste-commercants?search=&categorie_id=$categoryId&sous_categorie_id=$sousCategory";
     }
 
     private static function isEconomie(array $categories, BottinRepository $bottinRepository): ?stdClass
