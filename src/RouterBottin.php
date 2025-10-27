@@ -71,7 +71,7 @@ class RouterBottin
             return self::generateCategoryUrlCap($category, new BottinRepository());
         }
 
-        return self::getBaseUrlSite(Theme::ECONOMIE) . self::BOTTIN_CATEGORY_URL . '/' . $category->slug;
+        return self::getBaseUrlSite(Theme::ECONOMIE).self::BOTTIN_CATEGORY_URL.'/'.$category->slug;
     }
 
     public static function getUrlFicheBottin(int $blogId, stdClass $fiche): string
@@ -80,7 +80,7 @@ class RouterBottin
             return $url;
         }
 
-        return self::getBaseUrlSite($blogId) . self::BOTTIN_FICHE_URL . $fiche->slug;
+        return self::getBaseUrlSite($blogId).self::BOTTIN_FICHE_URL.$fiche->slug;
     }
 
     public function addRouteBottin(): void
@@ -89,8 +89,8 @@ class RouterBottin
             'init',
             function () {
                 add_rewrite_rule(
-                    self::BOTTIN_FICHE_URL . '([a-zA-Z0-9-]+)[/]?$',
-                    'index.php?' . self::PARAM_BOTTIN_FICHE . '=$matches[1]',
+                    self::BOTTIN_FICHE_URL.'([a-zA-Z0-9-]+)[/]?$',
+                    'index.php?'.self::PARAM_BOTTIN_FICHE.'=$matches[1]',
                     'top'
                 );
             }
@@ -116,7 +116,7 @@ class RouterBottin
                     return $template;
                 }
 
-                return get_template_directory() . '/single-bottin_fiche.php';
+                return get_template_directory().'/single-bottin_fiche.php';
             }
         );
     }
@@ -127,8 +127,8 @@ class RouterBottin
             'init',
             function () {
                 add_rewrite_rule(
-                    self::BOTTIN_CATEGORY_URL . '/([a-zA-Z0-9-]+)[/]?$',
-                    'index.php?' . self::PARAM_BOTTIN_CATEGORY . '=$matches[1]',
+                    self::BOTTIN_CATEGORY_URL.'/([a-zA-Z0-9-]+)[/]?$',
+                    'index.php?'.self::PARAM_BOTTIN_CATEGORY.'=$matches[1]',
                     'top'
                 );
             }
@@ -154,7 +154,7 @@ class RouterBottin
                     return $template;
                 }
 
-                return get_template_directory() . '/category_bottin.php';
+                return get_template_directory().'/category_bottin.php';
             }
         );
     }
@@ -164,7 +164,15 @@ class RouterBottin
      */
     public static function generateFicheUrlCap(stdClass $fiche): ?string
     {
-        return 'https://cap.marche.be/en_GB/commerce?id=' . $fiche->id;
+        $bottinRepository = new BottinRepository();
+        $categories = $bottinRepository->getCategoriesOfFiche($fiche->id);
+        if (self::isEconomie($categories, $bottinRepository) === null) {
+            return null;
+        }
+
+        $urlBase = 'https://cap.marche.be/en_GB/commerce?id='.$fiche->id;
+
+        return $urlBase;
     }
 
     /**
