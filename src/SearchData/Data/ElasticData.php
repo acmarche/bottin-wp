@@ -74,7 +74,7 @@ class ElasticData
             $content .= $this->getPublications($category);
             if ($siteId === Theme::ADMINISTRATION) {
                 if ($category->cat_ID === 77) {
-                    dd($content);
+
                 }
             }
 
