@@ -4,7 +4,7 @@ namespace AcMarche\Bottin\Search;
 
 use AcMarche\Bottin\SearchData\Adl\AdlIndexer;
 use AcMarche\Bottin\SearchData\Data\ElasticData;
-use AcMarche\MarcheTail\Inc\Theme;
+use AcMarche\Theme\Inc\Theme;
 use Meilisearch\Contracts\DeleteTasksQuery;
 use Meilisearch\Endpoints\Indexes;
 use Meilisearch\Endpoints\Keys;

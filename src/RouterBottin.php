@@ -4,7 +4,7 @@
 namespace AcMarche\Bottin;
 
 use AcMarche\Bottin\Repository\BottinRepository;
-use AcMarche\MarcheTail\Inc\Theme;
+use AcMarche\Theme\Inc\Theme;
 use stdClass;
 
 class RouterBottin

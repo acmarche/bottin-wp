@@ -38,7 +38,7 @@ class MeiliSearchCommand extends Command
         $keyword = (bool)$input->getArgument('keyword');
 
         if ($keyword) {
-            $result = $this->searchMeili->search($keyword);
+            $result = $this->searchMeili->doSearch($keyword);
 
             $io->section("Result ".$result->count());
             $this->display($result->getHits());

@@ -6,9 +6,9 @@ use AcMarche\Bottin\Bottin;
 use AcMarche\Bottin\Mailer;
 use AcMarche\Bottin\Repository\BottinRepository;
 use AcMarche\Bottin\RouterBottin;
-use AcMarche\MarcheTail\Inc\RouterMarche;
-use AcMarche\MarcheTail\Inc\Theme;
-use AcMarche\MarcheTail\Lib\WpRepository;
+use AcMarche\Theme\Inc\RouterMarche;
+use AcMarche\Theme\Inc\Theme;
+use AcMarche\Theme\Lib\WpRepository;
 use AcMarche\UrbaWeb\Entity\Permis;
 use BottinCategoryMetaBox;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -71,6 +71,7 @@ class ElasticData
 
             $content .= $this->getContentFiches($category);
             $content .= $this->getContentEnquetes($category->cat_ID);
+            $content .= $this->getPublications($category);
 
             $children = $this->wpRepository->getChildrenOfCategory($category->cat_ID);
             $tags = [];
@@ -89,6 +90,7 @@ class ElasticData
             $document->content = $content;
             $document->tags = $tags;
             $document->date = $date;
+            $document->type = 'catégorie';
             $document->url = get_category_link($category->cat_ID);
 
             $datas[] = $document;
@@ -186,6 +188,14 @@ class ElasticData
             }
         }
 
+        if ($siteId === Theme::ADMINISTRATION) {
+            $publications = WpRepository::getAllPublications();
+            foreach ($publications as $publication) {
+                //$category = get_category($publication->category_wpCategoryId);
+                $datas[] = $this->createDocumentElasticFromPublication($publication, $siteId);
+            }
+        }
+
         return $datas;
     }
 
@@ -261,7 +271,24 @@ class ElasticData
         $document->content = Cleaner::cleandata($content);
         $document->tags = $categories;
         $document->date = $date;
+        $document->type = 'article';
         $document->url = get_permalink($post->ID);
+
+        return $document;
+    }
+
+
+    private function createDocumentElasticFromPublication(\stdClass $publication, int $siteId): DocumentElastic
+    {
+        $document = new DocumentElastic();
+        $document->id = $this->createId($publication->id, "publication", $siteId);
+        $document->name = Cleaner::cleandata($publication->name);
+        $document->excerpt = "";
+        $document->content = "";
+        $document->tags = [[$publication->category_name]];
+        $document->date = $publication->created_at;
+        $document->type = 'publication';
+        $document->url = $publication->url;
 
         return $document;
     }
@@ -277,6 +304,19 @@ class ElasticData
         }
 
         return '';
+    }
+
+    public function getPublications(\WP_Term $category): string
+    {
+        $txt = '';
+        if (get_current_blog_id() === Theme::ADMINISTRATION) {
+            $publications = WpRepository::getPublications($category->term_id);
+            foreach ($publications as $publication) {
+                $txt .= $publication->title." ";
+            }
+        }
+
+        return $txt;
     }
 
     /**
@@ -300,6 +340,7 @@ class ElasticData
             $document->content = $this->bottinData->getContentFiche($fiche);
             $document->tags = $categories;
             $document->ids = $categoriesIds;
+            $document->type = 'bottin';
             list($date, $heure) = explode(' ', $fiche->created_at);
             $document->date = $date;
             $document->url = RouterBottin::getUrlFicheBottin($idSite, $fiche);
@@ -326,6 +367,7 @@ class ElasticData
             $document->excerpt = $category->description;
             $document->tags = [];//todo
             $document->date = $created[0];
+            $document->type = '';
             $document->url = RouterBottin::getUrlCategoryBottin($category);
             $fiches = $this->bottinRepository->getFichesByCategory($category->id);
             $document->count = count($fiches);
