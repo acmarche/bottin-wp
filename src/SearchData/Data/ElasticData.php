@@ -280,6 +280,7 @@ class ElasticData
 
     private function createDocumentElasticFromPublication(\stdClass $publication, int $siteId): DocumentElastic
     {
+        dump($publication);
         $document = new DocumentElastic();
         $document->id = $this->createId($publication->id, "publication", $siteId);
         $document->name = Cleaner::cleandata($publication->name);
