@@ -72,6 +72,11 @@ class ElasticData
             $content .= $this->getContentFiches($category);
             $content .= $this->getContentEnquetes($category->cat_ID);
             $content .= $this->getPublications($category);
+            if ($siteId === Theme::ADMINISTRATION) {
+                if ($category->cat_ID === 77) {
+                    dd($content);
+                }
+            }
 
             $children = $this->wpRepository->getChildrenOfCategory($category->cat_ID);
             $tags = [];
@@ -309,11 +314,10 @@ class ElasticData
     public function getPublications(\WP_Term $category): string
     {
         $txt = '';
-        if (get_current_blog_id() === Theme::ADMINISTRATION) {
-            $publications = WpRepository::getPublications($category->term_id);
-            foreach ($publications as $publication) {
-                $txt .= $publication->title." ";
-            }
+
+        $publications = WpRepository::getPublications($category->term_id);
+        foreach ($publications as $publication) {
+            $txt .= $publication->title." ";
         }
 
         return $txt;
