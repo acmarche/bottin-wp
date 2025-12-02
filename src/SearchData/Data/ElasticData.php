@@ -280,14 +280,13 @@ class ElasticData
 
     private function createDocumentElasticFromPublication(\stdClass $publication, int $siteId): DocumentElastic
     {
-        dump($publication);
         $document = new DocumentElastic();
         $document->id = $this->createId($publication->id, "publication", $siteId);
         $document->name = Cleaner::cleandata($publication->name);
         $document->excerpt = "";
         $document->content = "";
         $document->tags = [[$publication->category_name]];
-        $document->date = $publication->created_at;
+        $document->date = $publication->createdAt;
         $document->type = 'publication';
         $document->url = $publication->url;
 
