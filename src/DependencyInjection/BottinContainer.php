@@ -5,7 +5,6 @@ namespace AcMarche\Bottin\DependencyInjection;
 use AcMarche\Bottin\Search\SearchMeili;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\Debug;
 
 class BottinContainer
@@ -30,9 +29,6 @@ class BottinContainer
         $containerBuilder = new ContainerBuilder();
 
         $kernel = new Kernel($env, $debug);
-        (new Dotenv())
-            ->bootEnv($kernel->getProjectDir().'/.env');
-
         $kernel->boot();
 
         $this->container = $kernel->getContainer();

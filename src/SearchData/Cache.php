@@ -5,11 +5,15 @@ namespace AcMarche\Bottin\SearchData;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Cache\CacheInterface;
 
 class Cache
 {
     public static $instanceObject = null;
+    private static ?SluggerInterface $slugger = null;
 
     public static function instance(): CacheInterface
     {
@@ -78,5 +82,30 @@ class Cache
     public static function generateCodeCategory(int $blogId, int $categoryId): string
     {
         return 'category-'.$blogId.'-'.$categoryId;
+    }
+    public static function generateKey(string $cacheKey): string
+    {
+        if (!self::$slugger) {
+            self::$slugger = new AsciiSlugger();
+        }
+
+        $keyUnicode = new UnicodeString($cacheKey);
+
+        return self::$slugger->slug($keyUnicode->ascii()->toString());
+    }
+    // Helper method to delete an item from cache
+    public static function delete(string $key): bool
+    {
+        $cacheKey = self::generateKey($key);
+
+        return self::instance()->delete($cacheKey);
+    }
+
+    // Helper method to get an item from cache
+    public static function get(string $key, callable $callback, ?float $beta = null, ?array $tags = null)
+    {
+        $cacheKey = self::generateKey($key);
+
+        return self::instance()->get($cacheKey, $callback, $beta, $tags);
     }
 }

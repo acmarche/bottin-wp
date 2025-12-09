@@ -13,7 +13,6 @@ class AdlIndexer
     public function getAllCategories(): array
     {
         if (!$this->adlClient) {
-            Env::loadEnv();
             $this->adlClient = new AdlClient($_ENV['ADL_URL']);
         }
 
@@ -55,7 +54,6 @@ class AdlIndexer
     public function getAllPosts(): array
     {
         if (!$this->adlClient) {
-            Env::loadEnv();
             $this->adlClient = new AdlClient($_ENV['ADL_URL']);
         }
 

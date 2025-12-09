@@ -17,15 +17,11 @@ class Bottin
 
     public static function getUrlBottin(): string
     {
-        Env::loadEnv();
-
         return $_ENV['DB_BOTTIN_URL'].'/bottin/fiches/';
     }
 
     public static function getUrlDocument(): string
     {
-        Env::loadEnv();
-
         return $_ENV['DB_BOTTIN_URL'].'/bottin/documents/';
     }
 
