@@ -83,6 +83,8 @@ class PivotCommand extends Command
             return;
         }
 
+        $this->saveToFile($content);
+
         try {
             Cache::get($cacheKey, function () use ($content) {
                 return $content;
