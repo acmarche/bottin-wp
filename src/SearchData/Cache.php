@@ -2,6 +2,8 @@
 
 namespace AcMarche\Bottin\SearchData;
 
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\Request;
@@ -107,5 +109,23 @@ class Cache
         $cacheKey = self::generateKey($key);
 
         return self::instance()->get($cacheKey, $callback, $beta, $tags);
+    }
+
+    // Helper method to get an item from cache only if it exists (no computation)
+    public static function getIfExists(string $cacheKey): mixed
+    {
+        $cache = self::instance();
+
+        // Both ApcuAdapter and FilesystemAdapter implement CacheItemPoolInterface
+        if ($cache instanceof CacheItemPoolInterface) {
+            try {
+                $item = $cache->getItem($cacheKey);
+            } catch (InvalidArgumentException $e) {
+                 return null;
+            }
+            return $item->isHit() ? $item->get() : null;
+        }
+
+        return null;
     }
 }
