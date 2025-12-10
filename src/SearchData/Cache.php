@@ -14,7 +14,6 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 class Cache
 {
-    public static $instanceObject = null;
     private static ?SluggerInterface $slugger = null;
     private static ?CacheInterface $cache = null;
 
@@ -73,7 +72,10 @@ class Cache
         return self::instance()->delete($cacheKey);
     }
 
-    // Helper method to get an item from cache
+    /**
+     *
+     * @throws InvalidArgumentException
+     */
     public static function get(string $key, callable $callback, ?float $beta = null, ?array $tags = null)
     {
         $cacheKey = self::generateKey($key);
