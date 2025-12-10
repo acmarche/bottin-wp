@@ -51,12 +51,12 @@ class PivotCommand extends Command
     {
         $level = ContentEnum::LVL4->value;
         $cacheKey = Cache::generateKey(PivotRepository::$keyAll);
-
+        $today = date('Y-m-d');
         try {
             $response = $this->pivotApi->query($level);
             $content = $response?->getContent();
         } catch (\Exception|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
-            $this->io->error('No content returned from Pivot API'.$e->getMessage());
+            $this->io->error('No content returned from Pivot API' . $e->getMessage());
 
             return;
         }
@@ -66,6 +66,14 @@ class PivotCommand extends Command
             return;
         }
 
+        $dataDir = $_ENV['APP_CACHE_DIR'] . '/../data';
+
+        if (!is_dir($dataDir)) {
+            mkdir($dataDir, 0755, true);
+        }
+        $filename = $dataDir . '/pivot_' . $today . '.json';
+        file_put_contents($filename, $content);
+
         if ($purge) {
             Cache::delete($cacheKey);
         }
@@ -73,24 +81,21 @@ class PivotCommand extends Command
         try {
             $events = $this->parser->parseJsonFile($content);
         } catch (\JsonException $e) {
-            $this->io->error('Parse error '.$e->getMessage());
+            $this->io->error('Parse error ' . $e->getMessage());
 
             return;
         } catch (\Throwable $e) {
-            $this->io->error('Parse error '.$e->getMessage());
+            $this->io->error('Parse error ' . $e->getMessage());
 
             return;
         }
-
-        $this->io->success('Content parsed '.count($events).' events');
 
         try {
             Cache::get($cacheKey, function () use ($content) {
                 return $content;
             });
-            $this->io->success('Content cached');
         } catch (\Exception $e) {
-            $this->io->error('Error cache'.$e->getMessage());
+            $this->io->error('Error cache' . $e->getMessage());
 
             return;
         }
@@ -105,14 +110,14 @@ class PivotCommand extends Command
         try {
             $response = $this->pivotApi->loadEvent($codeCgt, $level);
         } catch (TransportExceptionInterface $e) {
-            $this->io->error('No content returned from Pivot API'.$e->getMessage());
+            $this->io->error('No content returned from Pivot API' . $e->getMessage());
 
             return;
         }
         try {
             $content = $response?->getContent();
         } catch (ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
-            $this->io->error('No content returned from Pivot API'.$e->getMessage());
+            $this->io->error('No content returned from Pivot API' . $e->getMessage());
 
             return;
         }
@@ -126,23 +131,22 @@ class PivotCommand extends Command
         try {
             $data = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $this->io->error('Error parse event code '.$codeCgt.' error '.$e->getMessage());
+            $this->io->error('Error parse event code ' . $codeCgt . ' error ' . $e->getMessage());
         }
 
         try {
             $this->parser->parseEvent($data['offre'][0]);
         } catch (\Exception $exception) {
-            $this->io->error('Error parse event code '.$codeCgt.' '.$exception->getMessage());
+            $this->io->error('Error parse event code ' . $codeCgt . ' ' . $exception->getMessage());
         }
 
-        $cacheKey = Cache::generateKey(PivotRepository::$keyAll).'-'.$codeCgt;
+        $cacheKey = Cache::generateKey(PivotRepository::$keyAll) . '-' . $codeCgt;
         try {
             Cache::get($cacheKey, function () use ($content) {
                 return $content;
             });
-            $this->io->success('Event cached');
         } catch (\Exception $e) {
-            $this->io->error('Event Error cache'.$e->getMessage());
+            $this->io->error('Event Error cache' . $codeCgt.' ' . $e->getMessage());
 
             return;
         }
