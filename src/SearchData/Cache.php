@@ -21,7 +21,7 @@ class Cache
     {
         if (!self::$cache) {
             $client = RedisAdapter::createConnection('redis://localhost');
-            self::$cache = new RedisTagAwareAdapter($client, 'marchebe', 60 * 60 * 8);
+            self::$cache = new RedisTagAwareAdapter($client, 'marchebe', 60 * 60 * 26);
         }
 
         return self::$cache;
