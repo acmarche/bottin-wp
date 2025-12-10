@@ -8,6 +8,7 @@ use AcMarche\Theme\Lib\Pivot\Enums\ContentEnum;
 use AcMarche\Theme\Lib\Pivot\Parser\EventParser;
 use AcMarche\Theme\Lib\Pivot\Repository\PivotApi;
 use AcMarche\Theme\Lib\Pivot\Repository\PivotRepository;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,28 +52,20 @@ class PivotCommand extends Command
     {
         $level = ContentEnum::LVL4->value;
         $cacheKey = Cache::generateKey(PivotRepository::$keyAll);
-        $today = date('Y-m-d');
+
         try {
             $response = $this->pivotApi->query($level);
             $content = $response?->getContent();
         } catch (\Exception|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
             $this->io->error('No content returned from Pivot API' . $e->getMessage());
-
-            return;
+            $content = null;
         }
+
         if ($content === null) {
-            $this->io->error('No content returned from Pivot API');
-
-            return;
+            $content = $this->readFile();
+            if (!$content)
+                return;
         }
-
-        $dataDir = $_ENV['APP_CACHE_DIR'] . '/../data';
-
-        if (!is_dir($dataDir)) {
-            mkdir($dataDir, 0755, true);
-        }
-        $filename = $dataDir . '/pivot_' . $today . '.json';
-        file_put_contents($filename, $content);
 
         if ($purge) {
             Cache::delete($cacheKey);
@@ -94,11 +87,12 @@ class PivotCommand extends Command
             Cache::get($cacheKey, function () use ($content) {
                 return $content;
             });
-        } catch (\Exception $e) {
+        } catch (\Exception|InvalidArgumentException $e) {
             $this->io->error('Error cache' . $e->getMessage());
 
             return;
         }
+
         foreach ($events as $event) {
             $this->fetchAll($event->codeCgt, $level);
         }
@@ -146,11 +140,31 @@ class PivotCommand extends Command
                 return $content;
             });
         } catch (\Exception $e) {
-            $this->io->error('Event Error cache' . $codeCgt.' ' . $e->getMessage());
+            $this->io->error('Event Error cache' . $codeCgt . ' ' . $e->getMessage());
 
             return;
         }
 
+    }
+
+    private function saveToFile(string $content): void
+    {
+        $dataDir = $_ENV['APP_CACHE_DIR'] . '/../data';
+
+        if (!is_dir($dataDir)) {
+            mkdir($dataDir, 0755, true);
+        }
+        $filename = $dataDir . '/pivot.json';
+        file_put_contents($filename, $content);
+    }
+
+    private function readFile(): ?string
+    {
+        if (is_readable($filename = $_ENV['APP_CACHE_DIR'] . '/../data/pivot.json')) {
+            return file_get_contents($filename);
+        }
+        $this->io->error('File ' . $filename . ' not found');
+        return null;
     }
 
 }
