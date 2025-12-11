@@ -154,10 +154,46 @@ class PivotCommand extends Command
         $dataDir = $_ENV['APP_CACHE_DIR'] . '/../data';
 
         if (!is_dir($dataDir)) {
-            mkdir($dataDir, 0755, true);
+            if (!mkdir($dataDir, 0755, true)) {
+                $this->io->error('Failed to create directory: ' . $dataDir);
+                return;
+            }
         }
+
         $filename = $dataDir . '/pivot.json';
-        file_put_contents($filename, $content);
+        $handle = fopen($filename, 'w');
+
+        if ($handle === false) {
+            $this->io->error('Failed to open file for writing: ' . $filename);
+            return;
+        }
+
+        if (!flock($handle, LOCK_EX)) {
+            $this->io->error('Failed to acquire lock on file: ' . $filename);
+            fclose($handle);
+            return;
+        }
+
+        $bytesToWrite = strlen($content);
+        $bytesWritten = fwrite($handle, $content);
+
+        flock($handle, LOCK_UN);
+        fclose($handle);
+
+        if ($bytesWritten === false) {
+            $this->io->error('Failed to write to file: ' . $filename);
+            return;
+        }
+
+        if ($bytesWritten !== $bytesToWrite) {
+            $this->io->error(sprintf(
+                'Incomplete write to %s: %d of %d bytes written',
+                $filename,
+                $bytesWritten,
+                $bytesToWrite
+            ));
+            return;
+        }
     }
 
     private function readFile(): ?string
