@@ -4,6 +4,7 @@
 namespace AcMarche\Bottin\Command;
 
 use AcMarche\Bottin\SearchData\Cache;
+use AcMarche\Common\Mailer;
 use AcMarche\Theme\Lib\Pivot\Enums\ContentEnum;
 use AcMarche\Theme\Lib\Pivot\Parser\EventParser;
 use AcMarche\Theme\Lib\Pivot\Repository\PivotApi;
@@ -58,6 +59,7 @@ class PivotCommand extends Command
             $content = $response?->getContent();
         } catch (\Exception|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
             $this->io->error('No content returned from Pivot API' . $e->getMessage());
+            Mailer::sendError("pivot api", $e->getMessage());
             $content = null;
         }
 
@@ -73,12 +75,9 @@ class PivotCommand extends Command
 
         try {
             $events = $this->parser->parseJsonFile($content);
-        } catch (\JsonException $e) {
+        } catch (\JsonException|\Throwable $e) {
             $this->io->error('Parse error ' . $e->getMessage());
-
-            return;
-        } catch (\Throwable $e) {
-            $this->io->error('Parse error ' . $e->getMessage());
+            Mailer::sendError("pivot parse full json", $e->getMessage());
 
             return;
         }
@@ -91,6 +90,7 @@ class PivotCommand extends Command
             });
         } catch (\Exception|InvalidArgumentException $e) {
             $this->io->error('Error cache' . $e->getMessage());
+            Mailer::sendError("pivot Error cache full json", $e->getMessage());
 
             return;
         }
@@ -107,6 +107,7 @@ class PivotCommand extends Command
             $response = $this->pivotApi->loadEvent($codeCgt, $level);
         } catch (TransportExceptionInterface $e) {
             $this->io->error('No content returned from Pivot API' . $e->getMessage());
+            Mailer::sendError("Pivot API get $codeCgt ", $e->getMessage());
 
             return;
         }
@@ -127,13 +128,15 @@ class PivotCommand extends Command
         try {
             $data = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $this->io->error('Error parse event code ' . $codeCgt . ' error ' . $e->getMessage());
+            $this->io->error('Error json_decode code ' . $codeCgt . ' error ' . $e->getMessage());
+            Mailer::sendError("Error json_decode code $codeCgt ", $e->getMessage());
         }
 
         try {
             $this->parser->parseEvent($data['offre'][0]);
         } catch (\Exception $exception) {
             $this->io->error('Error parse event code ' . $codeCgt . ' ' . $exception->getMessage());
+            Mailer::sendError("Error parse event code $codeCgt ", $e->getMessage());
         }
 
         $cacheKey = Cache::generateKey(PivotRepository::$keyAll) . '-' . $codeCgt;
