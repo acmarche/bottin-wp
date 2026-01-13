@@ -285,10 +285,9 @@ class ElasticData
 
     private function createDocumentElasticFromPublication(\stdClass $publication, int $siteId): DocumentElastic
     {
-        dump($publication);
         $document = new DocumentElastic();
         $document->id = $this->createId($publication->id, "publication", $siteId);
-        $document->name = Cleaner::cleandata($publication->name);
+        $document->name = Cleaner::cleandata($publication->title);
         $document->excerpt = "";
         $document->content = "";
         $document->tags = [[$publication->category_name]];
@@ -318,7 +317,7 @@ class ElasticData
 
         $publications = WpRepository::getPublications($category->term_id);
         foreach ($publications as $publication) {
-            $txt .= $publication->name." ";
+            $txt .= $publication->title." ";
         }
 
         return $txt;
