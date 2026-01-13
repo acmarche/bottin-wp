@@ -317,7 +317,7 @@ class ElasticData
 
         $publications = WpRepository::getPublications($category->term_id);
         foreach ($publications as $publication) {
-            $txt .= $publication->title." ";
+            $txt .= $publication->name." ";
         }
 
         return $txt;

@@ -26,7 +26,6 @@ class MeiliServer
         private string $masterKey,
     ) {
         $this->elasticData = new ElasticData();
-
     }
 
     /**
@@ -60,7 +59,7 @@ class MeiliServer
         return $this->client->index($this->indexName)->updateFilterableAttributes($this->facetFields);
     }
 
-    public function addContent()
+    public function addContent(): void
     {
         $this->init();
 
